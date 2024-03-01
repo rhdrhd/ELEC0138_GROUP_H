@@ -1,9 +1,8 @@
 # ELEC0138_GROUP_H
 
-This is the repo for group H.
-
 For environment setup:
 
+`conda create -n security python=3.8`
 `pip install Flask Flask-Login`
 
 To run the website:
