@@ -2,8 +2,10 @@
 
 For environment setup:
 
-`conda create -n security python=3.8`
-`pip install Flask Flask-Login`
+```
+conda create -n security python=3.8
+pip install -r requirements.txt
+```
 
 To run the website:
 
