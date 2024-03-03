@@ -2,23 +2,26 @@
 
 For environment setup:
 
-```
-conda create -n security python=3.8
-pip install -r requirements.txt
+```bash
+$ make create-env
+# or
+$ conda env create -f environment.yml
 ```
 
 To run the website:
 
-`python app.py`
+```bash
+$ python app.py
+```
 
 Then go to 
 
-`http://127.0.0.1:5000/login`
+* `http://127.0.0.1:5000/login`
 
 ---
 By default 
 
-`username: elec0138`
+* `username: elec0138`
 
-`password: 8964`
+* `password: 8964`
 
