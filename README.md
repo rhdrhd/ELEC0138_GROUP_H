@@ -8,9 +8,17 @@ $ make create-env
 $ conda env create -f environment.yml
 ```
 
+Activate your conda environment:
+
+```bash
+$ conda activate security
+```
+
 To run the website:
 
 ```bash
+$ make
+# or
 $ python app.py
 ```
 
