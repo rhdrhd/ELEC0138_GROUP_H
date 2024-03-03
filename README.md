@@ -30,6 +30,5 @@ Then go to
 By default 
 
 * `username: elec0138`
-
 * `password: 8964`
 
