@@ -46,8 +46,8 @@ async function userLogin() {
 <template>
   <h1>Login</h1>
   <div>
-    <input v-model="username">
-    <input v-model="password">
+    <li>Username: <input v-model="username"></li>
+    <li>Password: <input v-model="password"></li>
     <button @click.prevent="userLogin">
       Submit
     </button>
