@@ -1,13 +1,16 @@
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 
-const backend_url = 'http://127.0.0.1:5000'
+const router = useRouter()
+
+const backend_url = import.meta.env.VITE_APP_BACKEND_URL
 const login_api = backend_url + '/login'
 
 const username = ref('')
 const password = ref('')
 const token = ref('')
-const isDebug = ref(true)
+const isDebug = ref(false)
 const resp = ref(null)
 
 async function userLogin() {
@@ -27,7 +30,10 @@ async function userLogin() {
     console.log(data);
     if (response.ok) {
       token.value = data.data.token
-      alert(data.msg); // Successful login
+      // We can get it by localStorage.getItem('userToken');
+      localStorage.setItem('userToken', token.value);
+      // navigate to dashboard after login
+      router.push('/dashboard')
     } else {
       alert(data.msg); // Error or invalid login
     }
@@ -47,7 +53,7 @@ async function userLogin() {
     <div>
     </div>
     <div>
-        <button @click.prevent="isDebug = !isDebug">Debug Mode</button>
+        <button @click.prevent="isDebug = !isDebug">Debug Mode</button> isDebug: {{ isDebug }}
         <div v-if="isDebug">Debug info:
             <li>username: {{ username }}</li>
             <li>password: {{ password }}</li>

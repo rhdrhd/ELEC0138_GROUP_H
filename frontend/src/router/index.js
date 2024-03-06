@@ -23,9 +23,27 @@ const router = createRouter({
       // route level code-splitting
       // this generates a separate chunk (About.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
-      component: () => import('../views/LoginView.vue')
+      component: () => import('../views/LoginView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/dashboard',
+      name: 'dashboard',
+      // route level code-splitting
+      // this generates a separate chunk (About.[hash].js) for this route
+      // which is lazy-loaded when the route is visited.
+      component: () => import('../views/DashboardView.vue')
     },
   ]
 })
+
+router.beforeEach((to, from, next) => {
+  const isAuthenticated = localStorage.getItem('userToken'); // Or however you determine auth status
+  if (to.matched.some(record => record.meta.requiresAuth) && !isAuthenticated) {
+    next('/login');
+  } else {
+    next();
+  }
+});
 
 export default router
