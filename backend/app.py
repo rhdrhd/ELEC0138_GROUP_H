@@ -12,12 +12,14 @@ from constants import (
 )
 
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 from werkzeug.security import check_password_hash
 import sqlite3
 from jwt.exceptions import ExpiredSignatureError
 
 app = Flask(__name__)
 app.secret_key = APP_SECRET_KEY
+CORS(app)
 
 
 @app.route("/login", methods=["POST"])
@@ -30,7 +32,6 @@ def login():
     cur = conn.cursor()
     cur.execute("SELECT * FROM users WHERE username = ?", (username,))
     user = cur.fetchone()
-    user_id = str(user["id"])
     if user and check_password_hash(user["password"], password):
         # Payload data that you want to encode within the JWT.
         # Include claims like the user ID, expiration time, etc.
@@ -38,7 +39,7 @@ def login():
             minutes=DEFAULT_TOKEN_EXPIRATION_MINUTES
         )
         payload = {
-            "user_id": user_id,
+            "username": username,
             "exp": exp,
         }
         token = get_jwt_token(payload)
@@ -48,18 +49,18 @@ def login():
             "msg": "User logged in successfully.",
             "data": {
                 "user": {
-                    "id": user_id,
                     "username": username,
                 },
                 "token": token,
             },
         }
+        return jsonify(response), 200
     else:
         response = {
             "status": RESPONSE_STATUS[1],
             "msg": "Login failed. Invalid username or password.",
         }
-    return jsonify(response)
+        return jsonify(response), 401
 
 
 @app.route("/dashboard", methods=["POST"])
@@ -71,6 +72,7 @@ def dashboard():
             "status": RESPONSE_STATUS[1],
             "msg": "No token provided. Please provide a valid token to access this resource.",
         }
+        return jsonify(response), 401
     else:
         try:
             payload = get_jwt_payload(token)
@@ -80,17 +82,19 @@ def dashboard():
                 "status": RESPONSE_STATUS[1],
                 "msg": "Your session has expired. Please log in again.",
             }
+            return jsonify(response), 401
         except Exception:
             response = {
                 "status": RESPONSE_STATUS[1],
                 "msg": "token invalid. Please provide a valid token to access this resource.",
             }
+            return jsonify(response), 401
         else:
-            user_id = payload["user_id"]
+            username = payload["username"]
             conn = sqlite3.connect(DATABASE_FILENAME)
             conn.row_factory = sqlite3.Row
             cur = conn.cursor()
-            cur.execute("SELECT * FROM users WHERE id = ?", (user_id,))
+            cur.execute("SELECT * FROM users WHERE username = ?", (username,))
             user = cur.fetchone()
             username = user["username"]
 
@@ -99,12 +103,11 @@ def dashboard():
                 "msg": "Dashboard",
                 "data": {
                     "user": {
-                        "id": user_id,
                         "username": username,
                     },
                 },
             }
-    return jsonify(response)
+        return jsonify(response), 200
 
 
 if __name__ == "__main__":
