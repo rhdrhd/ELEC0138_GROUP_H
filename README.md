@@ -46,8 +46,7 @@ $ cd backend
 $ python app.py
 ```
 
-Then go to 
-The backend server's URL is `http://127.0.0.1:5000/login`.
+The backend server's URL is `http://127.0.0.1:5000`.
 
 ### Database
 
