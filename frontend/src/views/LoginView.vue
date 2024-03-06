@@ -44,21 +44,24 @@ async function userLogin() {
 </script>
 
 <template>
-    <h1>Login</h1>
-    <div>
-        <input v-model="username">
-        <input v-model="password">
-        <button @click.prevent="userLogin">Submit</button>
+  <h1>Login</h1>
+  <div>
+    <input v-model="username">
+    <input v-model="password">
+    <button @click.prevent="userLogin">
+      Submit
+    </button>
+  </div>
+  <div>
+    <button @click.prevent="isDebug = !isDebug">
+      Debug Mode
+    </button> isDebug: {{ isDebug }}
+    <div v-if="isDebug">
+      Debug info:
+      <li>username: {{ username }}</li>
+      <li>password: {{ password }}</li>
+      <li>response: {{ resp }}</li>
+      <li>token: {{ token }}</li>
     </div>
-    <div>
-    </div>
-    <div>
-        <button @click.prevent="isDebug = !isDebug">Debug Mode</button> isDebug: {{ isDebug }}
-        <div v-if="isDebug">Debug info:
-            <li>username: {{ username }}</li>
-            <li>password: {{ password }}</li>
-            <li>response: {{ resp }}</li>
-            <li>token: {{ token }}</li>
-        </div>
-    </div>
+  </div>
 </template>

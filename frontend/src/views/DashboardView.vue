@@ -13,7 +13,7 @@ async function userDashboard() {
     try {
     const response = await fetch(dashboard_api, {
       method: 'POST',
-      headers: {
+        headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -40,14 +40,17 @@ onMounted(() => {
 </script>
 
 <template>
-    <h1>Dashboard</h1>
-    <p>User: {{ username }}</p>
-    <div>
-        <button @click.prevent="isDebug = !isDebug">Debug Mode</button> isDebug: {{ isDebug }}
-        <div v-if="isDebug">Debug info:
-            <li>username: {{ username }}</li>
-            <li>response: {{ resp }}</li>
-            <li>token: {{ token }}</li>
-        </div>
+  <h1>Dashboard</h1>
+  <p>User: {{ username }}</p>
+  <div>
+    <button @click.prevent="isDebug = !isDebug">
+      Debug Mode
+    </button> isDebug: {{ isDebug }}
+    <div v-if="isDebug">
+      Debug info:
+      <li>username: {{ username }}</li>
+      <li>response: {{ resp }}</li>
+      <li>token: {{ token }}</li>
     </div>
+  </div>
 </template>
