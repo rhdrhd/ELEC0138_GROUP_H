@@ -1,11 +1,11 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
 
 const backend_url = import.meta.env.VITE_APP_BACKEND_URL
-const login_api = backend_url + '/login'
+const login_api = backend_url + '/api/v1/login'
 
 const username = ref('')
 const password = ref('')
@@ -38,9 +38,17 @@ async function userLogin() {
       alert(data.msg); // Error or invalid login
     }
   } catch (error) {
-    console.error('Error:', error);
+    // Login failed, remove the token if it exists
+    localStorage.removeItem('userToken');
+    console.error('Login failed:', error);
   }
 }
+
+onMounted(() => {
+  if (localStorage.getItem('userToken') !== "") {
+    router.push('/dashboard')
+  }
+})
 </script>
 
 <template>
