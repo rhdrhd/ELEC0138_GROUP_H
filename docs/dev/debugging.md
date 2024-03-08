@@ -12,6 +12,8 @@ $ python app.py
 
 ### v1 APIs
 
+> Tips: If you don't want to use `curl` to send requests, you can try [postman](https://www.postman.com/).
+
 * `/api/v1/login`
 
 ```bash
