@@ -23,6 +23,7 @@ import { RouterLink, RouterView } from 'vue-router'
 </div>
 </template>
 
+
 <style scoped>
 .headlines {
   position: fixed;
