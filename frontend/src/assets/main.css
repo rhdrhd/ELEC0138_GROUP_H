@@ -7,17 +7,16 @@
   font-weight: normal;
 }
 
-a,
-.green {
-  text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
-  transition: 0.4s;
-  padding: 3px;
+body {
+  display: flex;
+  place-items: center;
 }
+
 
 @media (hover: hover) {
   a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
+    transform: scale(1.4); /* Adjust the scale factor as needed */
+    transition: transform 0.3s ease, background-color 0.3s ease; /* Smooth transition for scaling and background color */
   }
 }
 
@@ -25,11 +24,13 @@ a,
   body {
     display: flex;
     place-items: center;
+    font-size: 18px;
   }
 
   #app {
-    display: grid;
+    display: block;
     grid-template-columns: 1fr 1fr;
     padding: 0 2rem;
   }
 }
+
