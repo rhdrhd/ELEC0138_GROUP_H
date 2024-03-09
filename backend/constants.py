@@ -3,6 +3,8 @@
 
 # Flask app
 APP_SECRET_KEY = "0138"
+# api
+API_PREFIX = "/api"
 
 # jwt token expiration
 DEFAULT_TOKEN_EXPIRATION_MINUTES = 5

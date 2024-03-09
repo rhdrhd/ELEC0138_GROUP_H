@@ -1,5 +1,14 @@
 # ELEC0138_GROUP_H
 
+## Contents
+
+- [Prerequisites](#Prerequisites)
+- [Environment Setup](#Environment-Setup)
+    - [Frontend](#Frontend)
+    - [Backend](#Backend)
+    - [Database](#Database)
+- [Debugging](#Debugging)
+
 ## Prerequisites
 
 * [Node.js 20.11.1](https://nodejs.org/en)
@@ -56,3 +65,7 @@ By default:
 
 * `username: elec0138`
 * `password: 8964`
+
+### Debugging
+
+* [Debugging guide](docs/dev/debugging.md)
