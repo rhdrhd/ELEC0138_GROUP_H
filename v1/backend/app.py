@@ -25,6 +25,14 @@ app = Flask(__name__)
 app.secret_key = APP_SECRET_KEY
 CORS(app)
 
+# TODO: tickets
+# @app.route(f"{API_PREFIX}/v1/tickets", methods=["POST"])
+
+# TODO: cart
+# @app.route(f"{API_PREFIX}/v1/cart", methods=["POST"])
+
+# TODO(xss, optional): comments
+# @app.route(f"{API_PREFIX}/v1/comments", methods=["POST"])
 
 @app.route(f"{API_PREFIX}/v1/login", methods=["POST"])
 def login():
