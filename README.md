@@ -69,3 +69,26 @@ By default:
 ### Debugging
 
 * [Debugging guide](docs/dev/debugging.md)
+
+### TODOs
+
+* [ ] Attacks
+    * [ ] Phishing (liuqiyuan)
+    * [ ] Brute-force (liuqiyuan)
+    * [ ] csrf
+    * [ ] mitm
+    * [ ] sql_injection
+    * [ ] credential_stuffing
+    * [ ] dos (luzhaoyan)
+    * [ ] xss
+* [ ] Website
+    * [ ] backend
+        * [ ] ticket (wangzirui)
+        * [ ] cart (yangyiwen)
+        * [ ] comments(optional)
+    * [ ] frontend
+        * [ ] ticket (wangzirui)
+        * [ ] cart (yangyiwen)
+        * [ ] comments(optional)
+    
+    
