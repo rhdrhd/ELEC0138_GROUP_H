@@ -34,6 +34,7 @@ CORS(app)
 # TODO(xss, optional): comments
 # @app.route(f"{API_PREFIX}/v1/comments", methods=["POST"])
 
+
 @app.route(f"{API_PREFIX}/v1/login", methods=["POST"])
 def login():
     req = request.get_json()
