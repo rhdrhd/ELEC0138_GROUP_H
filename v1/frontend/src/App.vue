@@ -26,7 +26,6 @@ import { RouterLink, RouterView } from 'vue-router'
 </div>
 </template>
 
-
 <style scoped>
 .headlines {
   position: fixed;
@@ -72,5 +71,10 @@ nav a, nav .router-link-active {
 
   /* Additional styling here */
 }
+}
+
+.router-link-active {
+  color: #81D8D0 !important;
+  transform: scale(1.4)
 }
 </style>
