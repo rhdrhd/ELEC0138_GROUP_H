@@ -5,6 +5,7 @@
 You need to create the "security" conda environment first.
 
 ```bash
+# cd v1 or v2
 $ cd backend
 $ conda activate security
 $ python app.py
