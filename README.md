@@ -16,6 +16,18 @@
 
 ## Environment Setup
 
+We offer two versions of our ticket sales website.
+One is the original version (v1) which may have some security risks and vulnerabilities,
+and the other is a newer version (v2) that incorporates numerous mechanisms to safeguard the system.
+
+To access each version of the website, you'll need to navigate to the respective directory first.
+
+```bash
+$ cd v1
+# or
+$ cd v2
+```
+
 ### Frontend
 
 We are using [Vue.js](https://vuejs.org/guide/quick-start) to create our frontend website.
@@ -23,6 +35,7 @@ We are using [Vue.js](https://vuejs.org/guide/quick-start) to create our fronten
 Open a new terminal and run:
 
 ```bash
+# cd v1 or v2
 $ cd frontend
 $ npm install
 $ npm run dev
@@ -37,6 +50,7 @@ We are using [Flask](https://flask.palletsprojects.com/en/3.0.x/) to create our 
 Open a new terminal and run:
 
 ```bash
+# cd v1 or v2
 $ make create-env
 # or
 $ conda env create -f environment.yml
@@ -51,6 +65,7 @@ $ conda activate security
 To run the website:
 
 ```bash
+# cd v1 or v2
 $ cd backend
 $ python app.py
 ```
@@ -90,5 +105,3 @@ By default:
         * [ ] ticket (wangzirui)
         * [ ] cart (yangyiwen)
         * [ ] comments(optional)
-    
-    
