@@ -10,7 +10,7 @@ python email_sending.py
 cd attacks/phishing/phishing_website/backend
 python app.py
 ```
-3. send login request to phishing backend. The phishing website will send the same request to real website. If login successful, the user account will be stolen.
+3. send login request to phishing backend. Always return login successful to user and save user attempts into user_credentials.csv under attacks/phishing/phishing_website/backend
 
 ## Phishing website
 Just use the same one as the real website in our project. Only login function is reimplemented.
