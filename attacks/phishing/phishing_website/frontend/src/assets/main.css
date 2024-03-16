@@ -1,0 +1,36 @@
+@import './base.css';
+
+#app {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-weight: normal;
+}
+
+body {
+  display: flex;
+  place-items: center;
+}
+
+
+@media (hover: hover) {
+  a:hover {
+    transform: scale(1.4); /* Adjust the scale factor as needed */
+    transition: transform 0.3s ease, background-color 0.3s ease; /* Smooth transition for scaling and background color */
+  }
+}
+
+@media (min-width: 1024px) {
+  body {
+    display: flex;
+    place-items: center;
+    font-size: 18px;
+  }
+
+  #app {
+    display: block;
+    grid-template-columns: 1fr 1fr;
+    padding: 0 2rem;
+  }
+}
+
