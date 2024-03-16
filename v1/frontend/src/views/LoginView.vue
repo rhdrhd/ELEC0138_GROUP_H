@@ -74,6 +74,7 @@ onMounted(() => {
   </div>
 </template>
 
+
 <style>
 h1 {
   margin-bottom: 2rem; /* Increase space below the heading */

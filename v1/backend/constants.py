@@ -9,9 +9,12 @@ API_PREFIX = "/api"
 # jwt token expiration
 DEFAULT_TOKEN_EXPIRATION_MINUTES = 5
 
-# Database
+# Database for users
 # Assuming you have a SQLite DB named 'users.db' with a table 'users' (id, username, password)
-DATABASE_FILENAME = "user.db"
+USER_DATABASE_FILENAME = "user.db"
+VENUE_DATABASE_FILENAME = "venue.db"
+
+
 
 # status for responses
 RESPONSE_STATUS = [

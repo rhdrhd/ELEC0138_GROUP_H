@@ -8,7 +8,8 @@ from auth import gen_jwt_token, validate_header, validate_and_decode_jwt
 from constants import (
     APP_SECRET_KEY,
     API_PREFIX,
-    DATABASE_FILENAME,
+    USER_DATABASE_FILENAME,
+    VENUE_DATABASE_FILENAME,
     DEFAULT_TOKEN_EXPIRATION_MINUTES,
     RESPONSE_STATUS,
 )
@@ -19,14 +20,22 @@ from flask_cors import CORS
 from werkzeug.security import check_password_hash
 
 CWD = os.getcwd()
-DATABASE_FILEPATH = os.path.join(CWD, DATABASE_FILENAME)
+USER_DATABASE_FILEPATH = os.path.join(CWD, USER_DATABASE_FILENAME)
+VENUE_DATABASE_FILEPATH = os.path.join(CWD, VENUE_DATABASE_FILENAME)
 
 app = Flask(__name__)
 app.secret_key = APP_SECRET_KEY
 CORS(app)
 
-# TODO: tickets
-# @app.route(f"{API_PREFIX}/v1/tickets", methods=["POST"])
+# TODO: venues
+@app.route(f"{API_PREFIX}/v1/venues", methods=["GET"])
+def get_venues():
+    cur = get_sqlite_cursor(VENUE_DATABASE_FILEPATH)
+    cur.execute("SELECT * FROM venue")
+    venues = cur.fetchall()
+    # Convert the venues to a list of dictionaries to make them JSON serializable
+    venues_list = [dict(venue) for venue in venues]
+    return jsonify({"status": RESPONSE_STATUS[0], "data": venues_list}), 200
 
 # TODO: cart
 # @app.route(f"{API_PREFIX}/v1/cart", methods=["POST"])
@@ -40,7 +49,7 @@ def login():
     req = request.get_json()
     username = req.get("username", "Unknown")
     password = req.get("password", "")
-    cur = get_sqlite_cursor(DATABASE_FILEPATH)
+    cur = get_sqlite_cursor(USER_DATABASE_FILEPATH)
     cur.execute("SELECT * FROM users WHERE username = ?", (username,))
     user = cur.fetchone()
 
@@ -79,8 +88,8 @@ def dashboard():
         return jsonify(err)
 
     # check username and password
-    DATABASE_FILEPATH = os.path.join(CWD, DATABASE_FILENAME)
-    cur = get_sqlite_cursor(DATABASE_FILEPATH)
+    #USER_DATABASE_FILEPATH = os.path.join(CWD, USER_DATABASE_FILENAME)
+    cur = get_sqlite_cursor(USER_DATABASE_FILEPATH)
     cur.execute("SELECT * FROM users WHERE username = ?", (payload["username"],))
     user = cur.fetchone()
     if user and user["password"] != payload["password"]:
