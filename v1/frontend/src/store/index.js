@@ -7,13 +7,24 @@ export default createStore({
     };
   },
   mutations: {
-    addToCart(state, item) {
-      const exists = state.cart.find(product => product.id === item.id);
-      if (exists) {
-        exists.quantity += 1;
+    addToCart(state, { item, quantityToAdd }) {
+      const existingItem = state.cart.find(cartItem => cartItem.id === item.id);
+      if (existingItem) {
+        const potentialNewQuantity = existingItem.quantity + quantityToAdd;
+        if (potentialNewQuantity > item.capacity) {
+          // Handle the case where adding more exceeds capacity
+          alert('The number of tickets have reached the all available tickets.');
+        } else {
+          existingItem.quantity += quantityToAdd;
+        }
       } else {
-        // Ensure the item added to the cart includes the price property
-        state.cart.push({...item, quantity: 1});
+        // Check if initial add exceeds capacity
+        if (quantityToAdd > item.capacity) {
+          alert('The number of tickets have reached the all available tickets.');
+        } else {
+          // If not exceeding capacity, add new item to cart
+          state.cart.push({ ...item, quantity: quantityToAdd });
+        }
       }
     },
     removeFromCart(state, itemId) {

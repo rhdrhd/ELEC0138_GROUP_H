@@ -27,7 +27,7 @@ app = Flask(__name__)
 app.secret_key = APP_SECRET_KEY
 CORS(app)
 
-# TODO: venues
+
 @app.route(f"{API_PREFIX}/v1/venues", methods=["GET"])
 def get_venues():
     cur = get_sqlite_cursor(VENUE_DATABASE_FILEPATH)
@@ -36,9 +36,6 @@ def get_venues():
     # Convert the venues to a list of dictionaries to make them JSON serializable
     venues_list = [dict(venue) for venue in venues]
     return jsonify({"status": RESPONSE_STATUS[0], "data": venues_list}), 200
-
-# TODO: cart
-# @app.route(f"{API_PREFIX}/v1/cart", methods=["POST"])
 
 # TODO(xss, optional): comments
 # @app.route(f"{API_PREFIX}/v1/comments", methods=["POST"])

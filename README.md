@@ -2,12 +2,15 @@
 
 ## Contents
 
-- [Prerequisites](#Prerequisites)
-- [Environment Setup](#Environment-Setup)
-    - [Frontend](#Frontend)
-    - [Backend](#Backend)
-    - [Database](#Database)
-- [Debugging](#Debugging)
+- [ELEC0138\_GROUP\_H](#elec0138_group_h)
+  - [Contents](#contents)
+  - [Prerequisites](#prerequisites)
+  - [Environment Setup](#environment-setup)
+    - [Frontend](#frontend)
+    - [Backend](#backend)
+    - [Database](#database)
+    - [Debugging](#debugging)
+    - [TODOs](#todos)
 
 ## Prerequisites
 
@@ -98,10 +101,10 @@ By default:
     * [ ] xss
 * [ ] Website
     * [ ] backend
-        * [ ] ticket (wangzirui)
-        * [ ] cart (yangyiwen)
+        * [X] ticket (wangzirui)
+        * [X] cart (yangyiwen)
         * [ ] comments(optional)
     * [ ] frontend
-        * [ ] ticket (wangzirui)
-        * [ ] cart (yangyiwen)
+        * [X] ticket (wangzirui)
+        * [X] cart (yangyiwen)
         * [ ] comments(optional)
