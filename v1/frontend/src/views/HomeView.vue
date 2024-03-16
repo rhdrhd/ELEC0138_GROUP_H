@@ -1,4 +1,24 @@
+<template>
+  <div>
+    <h1>Venues</h1>
+    <div class="venues-grid"> 
+      <div v-for="venue in venues" :key="venue.id" class="venue-card">
+        <div class="venue-info">
+        <h2>{{ venue.name }}</h2>
+        <p>{{ venue.description }}</p>
+      </div>
+      <div class = "venue-actions">
+        <p>Price: ${{ venue.price }}</p>
 
+        <!-- Numeric input for selecting quantity -->
+
+        <input  type="number" v-model.number="venue.quantity" min="1" :max="venue.capacity" />
+        <button  @click="addTicketToCart(venue, venue.quantity)">Add to Cart</button>
+        </div>
+      </div>
+  </div>
+  </div>
+</template>
 
 <script>
 const backend_url = import.meta.env.VITE_APP_BACKEND_URL
@@ -26,38 +46,22 @@ export default {
           console.error("There was an error fetching the venues:", error.message);
       }
     },
-    addToCart(venue) {
-        console.log('Adding to cart:', venue);
-        this.$store.dispatch('addToCart', venue);
-        //console.log(this.$store.state.cart);
-        //const cartItem = this.cart.find(item => item.id === venue.id);
-        //console.log('Adding to cart:', venue);
-        //if (cartItem) {
-            // If the item is already in the cart, you might want to increase quantity or do nothing
-            //alert('This item is already added to the cart.');
-        //} else {
-            //this.cart.push({...venue, quantity: 1}); // Spread the venue object and add a quantity property
-        //}
+    addTicketToCart(venue, quantity) {
+      // You might need to initialize quantity if it's not already done
+      quantity = quantity || 1; // Default to 1 if no quantity is selected
+      if (quantity > venue.capacity) {
+        alert('The selected quantity exceeds the available capacity.');
+      } else {
+        this.$store.dispatch('addToCart', { item: venue, quantityToAdd: quantity });
+      }
     },
   },
 };
 </script>
 
-<template>
-  <div>
-    <h1>Venues</h1>
-    <div class="venues-grid"> 
-      <div v-for="venue in venues" :key="venue.id" class="venue-card">
-        <h2>{{ venue.name }}</h2>
-        <p>{{ venue.description }}</p>
-        <p>Price: ${{ venue.price }}</p>
-        <button class="add-to-cart-btn" @click="addToCart(venue)">Add to Cart</button>
-      </div>
-  </div>
-  </div>
-</template>
 
-<style>
+
+<style scoped>
 
 /* Add styles for your venues here */
 h1 {
@@ -66,12 +70,12 @@ h1 {
   margin-bottom: 1rem;
 }
 h2 {
-  font:100;
+  font-size: 25px;
   font-style: italic;
 }
 .venues-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr); /* Creates 4 columns */
+  grid-template-columns: repeat(3, 1fr); /* Creates 4 columns */
   gap: 20px; /* Adjusts the space between grid items */
   padding: 20px; /* Adds some padding around the grid */
 }
@@ -93,10 +97,20 @@ h2 {
   transform: translateY(-5px); /* Lifts the card slightly on hover */
 }
 
-.add-to-cart-btn {
-  position: absolute;
-  right: 16px; /* Adjust based on your design */
-  bottom: 16px; /* Adjust based on your design */
+.venue-info {
+  padding: 16px;
+  flex: 1; /* Allows this div to expand and push actions to the bottom */
+}
+.venue-actions {
+  border-top: 1px solid #ccc; /* Visually separates actions from the rest of the card */
+  padding: 16px;
+  background: #f9f9f9; /* Slightly different background for the action area */
+  display: flex;
+  justify-content: space-between; /* Adjust based on your design needs */
+  align-items: center;
+}
+
+.venue-actions button {
   padding: 8px 16px; /* Example styling */
   background-color: #81D8D0; /* Example styling */
   color: rgb(68, 66, 66); /* Example styling */
@@ -105,9 +119,10 @@ h2 {
   cursor: pointer;
 }
 
-.add-to-cart-btn:hover {
+.venue-actions button:hover {
   background-color: #9fecec; /* Darken button on hover, example styling */
 }
+
 /* Responsive adjustments */
 @media (max-width: 1200px) {
   .venues-grid {
