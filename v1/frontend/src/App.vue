@@ -34,7 +34,7 @@ import { RouterLink, RouterView } from 'vue-router'
   left: 0;
   right:0;
   width: 100%;
-  background-color: #fff; /* Change the color as needed */
+  background-color: #81D8D0; /* Change the color as needed */
   z-index: 1000; /* Ensures the header stays on top of other content */
   box-shadow: 0 2px 5px rgba(10, 8, 8, 0.2); /* Optional: adds a shadow for better visibility */
 
@@ -57,20 +57,27 @@ nav {
 
 nav a, nav .router-link-active {
   text-decoration: none;
-  color: #000
+  color: #66aaa3
 
   /* Additional styling here */
 }
 
 @media (prefers-color-scheme: dark){
   .headlines {
-    background-color: #0b0b0b;
+    background-color: #81D8D0;
   }
   nav a, nav .router-link-active {
   text-decoration: none;
-  color: #fcf6f6
+  background-color: #81D8D0;
+  color: #66aaa3
 
   /* Additional styling here */
 }
 }
+
+.router-link-active {
+  color: #fff !important;
+  transform: scale(1.4)
+}
+
 </style>
