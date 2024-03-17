@@ -53,7 +53,6 @@ export default {
       if (quantity > venue.capacity) {
         alert('The selected quantity exceeds the available capacity.');
       } else {
-        window.alert('Added successfully!'); 
         this.$store.dispatch('addToCart', { item: venue, quantityToAdd: quantity });
       }
     },
