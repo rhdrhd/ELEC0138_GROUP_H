@@ -47,7 +47,9 @@ def login():
     username = req.get("username", "Unknown")
     password = req.get("password", "")
     cur = get_sqlite_cursor(USER_DATABASE_FILEPATH)
-    cur.execute("SELECT * FROM users WHERE username = ?", (username,))
+    # weak version of sql injection
+    cur.execute(f"SELECT * FROM users WHERE username = '{username}'")
+    #cur.execute("SELECT * FROM users WHERE username = ?", (username,))
     user = cur.fetchone()
 
     if user and check_password_hash(user["password"], password):
