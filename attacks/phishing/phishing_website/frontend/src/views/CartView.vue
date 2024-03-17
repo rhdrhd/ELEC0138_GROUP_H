@@ -85,7 +85,7 @@ export default {
 
 .item-actions button {
   padding: 10px;
-  background-color: #f64539;
+  background-color: #f44336;
   color: white;
   border: none;
   cursor: pointer;

