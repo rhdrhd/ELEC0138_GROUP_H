@@ -17,3 +17,13 @@ Just use the same one as the real website in our project. Only login function is
 
 ## Mitigation Method
 Using 2-factor authentication. Only the password stolen is not enough.
+
+On the user side, we provide a simple Multi-layer perceptron model to detect if a url is phishing url
+
+The training data and feature extractor is taken from https://github.com/vaibhavbichave/Phishing-URL-Detection/tree/master
+
+To run the url test:
+```
+cd attacks/phishing
+python url_detection
+```
