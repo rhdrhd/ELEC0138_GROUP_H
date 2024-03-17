@@ -95,16 +95,16 @@ By default:
     * [ ] Brute-force (liuqiyuan)
     * [ ] csrf
     * [ ] mitm
-    * [ ] sql_injection
+    * [ ] sql_injection (yangyiwen)
     * [ ] credential_stuffing
     * [ ] dos (luzhaoyan)
     * [ ] xss
 * [ ] Website
     * [ ] backend
         * [X] ticket (wangzirui)
-        * [X] cart (yangyiwen)
+        * [X] cart (wangzirui)
         * [ ] comments(optional)
     * [ ] frontend
         * [X] ticket (wangzirui)
-        * [X] cart (yangyiwen)
+        * [X] cart (wangzirui)
         * [ ] comments(optional)
