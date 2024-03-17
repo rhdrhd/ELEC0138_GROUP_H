@@ -25,5 +25,6 @@ The training data and feature extractor is taken from https://github.com/vaibhav
 To run the url test:
 ```
 cd attacks/phishing
-python url_detection
+pip install -r requirements.txt
+python url_detection.py
 ```
