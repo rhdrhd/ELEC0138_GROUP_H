@@ -16,6 +16,7 @@ export default createStore({
           alert('The number of tickets have reached the all available tickets.');
         } else {
           existingItem.quantity += quantityToAdd;
+          alert('Added successfully!'); 
         }
       } else {
         // Check if initial add exceeds capacity
@@ -24,6 +25,7 @@ export default createStore({
         } else {
           // If not exceeding capacity, add new item to cart
           state.cart.push({ ...item, quantity: quantityToAdd });
+          alert('Added successfully!'); 
         }
       }
     },
