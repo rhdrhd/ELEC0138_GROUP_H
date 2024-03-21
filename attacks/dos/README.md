@@ -3,7 +3,7 @@
 We focus on two types of DoS attacks.
 
 * HTTP Flooding
-* SYN Flooding
+* (Optional) SYN Flooding
 
 ## HTTP Flooding
 

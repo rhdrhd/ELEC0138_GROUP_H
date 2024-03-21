@@ -4,8 +4,8 @@ import threading
 
 ip = "127.0.0.1"
 port = 5000
-pack = 10
-thread = 10
+pack = 1000
+thread = 1000
 
 
 def start():

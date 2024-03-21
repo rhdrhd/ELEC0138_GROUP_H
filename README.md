@@ -18,7 +18,6 @@
 * [Anaconda](https://www.anaconda.com/) / [Miniconda](https://docs.anaconda.com/free/miniconda/index.html) for python 3.8
 
 ## Environment Setup
-
 We offer two versions of our ticket sales website.
 One is the original version (v1) which may have some security risks and vulnerabilities,
 and the other is a newer version (v2) that incorporates numerous mechanisms to safeguard the system.
@@ -94,10 +93,10 @@ By default:
     * [ ] Phishing (liuqiyuan)
     * [ ] Brute-force (liuqiyuan)
     * [ ] csrf
-    * [ ] mitm
+    * [ ] mitm (luzhaoyan)
     * [ ] sql_injection (yangyiwen)
     * [ ] credential_stuffing
-    * [ ] dos (luzhaoyan)
+    * [x] dos (luzhaoyan)
     * [ ] xss
 * [ ] Website
     * [ ] backend
