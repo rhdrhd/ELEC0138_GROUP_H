@@ -26,6 +26,7 @@
 </template>
 
 <script>
+import "@/assets/cart.css"
 import { mapActions, mapGetters } from 'vuex';
 
 export default {
@@ -52,50 +53,3 @@ export default {
   },
 };
 </script>
-
-<style>
-.cart-container {
-  max-width: 800px;
-  margin: auto;
-  padding: 20px;
-}
-
-.cart-items {
-  list-style-type: none;
-  padding: 0;
-}
-
-.cart-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid #ccc;
-  padding-bottom: 10px;
-  margin-bottom: 10px;
-}
-
-.item-info h2 {
-  margin: 0;
-  font-size: 1.5em;
-}
-
-.item-info p {
-  margin: 5px 0;
-}
-
-.item-actions button {
-  padding: 10px;
-  background-color: #f64539;
-  color: white;
-  border: none;
-  cursor: pointer;
-}
-
-.item-actions button:hover {
-  opacity: 0.9;
-}
-
-.cart-total h2 {
-  text-align: right;
-}
-</style>
