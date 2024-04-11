@@ -55,7 +55,7 @@ onMounted(() => {
   <h1>Dashboard</h1>
   <p>User: {{ username }}</p>
   <div>
-    <button @click.prevent="isDebug = !isDebug">
+    <button @click.prevent="isDebug = !isDebug" class="login-button">
       Debug Mode
     </button> isDebug: {{ isDebug }}
     <div v-if="isDebug">
@@ -66,7 +66,7 @@ onMounted(() => {
     </div>
   </div>
   <div>
-    <button @click="userLogout">
+    <button @click="userLogout" class="login-button">
       Sign Out
     </button>
   </div>
