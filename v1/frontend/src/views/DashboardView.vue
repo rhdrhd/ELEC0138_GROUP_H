@@ -5,6 +5,7 @@ const isDebug = ref(false)
 
 const backend_url = import.meta.env.VITE_APP_BACKEND_URL
 const dashboard_api = backend_url + '/api/v1/dashboard'
+const app_mode = import.meta.env.VITE_APP_MODE
 
 const token = ref('')
 const resp = ref(null)
@@ -12,38 +13,48 @@ const username = ref('')
 
 async function userDashboard() {
   console.log('User dashboard')
-  try {
-    token.value = 'Bearer ' + localStorage.getItem('userToken');
-    const response = await fetch(dashboard_api, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': token.value,
-      },
-    });
-    const data = await response.json();
-    resp.value = data
-    console.log(data);
-    if (response.ok) {
-      console.log("get /api/v1/dashboard response successfully")
-      username.value = data.data.user.username
-    } else if (response.status === 401) {
-      // Login failed, remove the token if it exists
-      localStorage.removeItem('userToken');
-      alert(data.msg); // Invalid login
-    } else {
-      alert(data.msg); // Error
+  if (app_mode == "safe") {
+    try {
+      token.value = 'Bearer ' + localStorage.getItem('userToken');
+      const response = await fetch(dashboard_api, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token.value,
+        },
+      });
+      const data = await response.json();
+      resp.value = data
+      console.log(data);
+      if (response.ok) {
+        console.log("get /api/v1/dashboard response successfully")
+        username.value = data.data.user.username
+      } else if (response.status === 401) {
+        // Login failed, remove the token if it exists
+        localStorage.removeItem('userToken');
+        alert(data.msg); // Invalid login
+      } else {
+        alert(data.msg); // Error
+      }
+    } catch (error) {
+      console.error('Dashboard Page Error:', error);
     }
-  } catch (error) {
-    console.error('Dashboard Page Error:', error);
+  } else {
+    // TODO (unsafe mode)
+    console.warn("NotImplementedError: unsafe mode for dashboard API")
   }
 }
 
 function userLogout() {
-  localStorage.removeItem('userToken');
-  token.value = '';
-  alert('User successfully logged out! See you next time!');
-  router.push('/login');
+  if (app_mode == "safe") {
+    localStorage.removeItem('userToken');
+    token.value = '';
+    alert('User successfully logged out! See you next time!');
+    router.push('/login');
+  } else {
+    // TODO (unsafe mode)
+    console.warn("NotImplementedError: unsafe mode for userLogout")
+  }
 }
 
 onMounted(() => {
