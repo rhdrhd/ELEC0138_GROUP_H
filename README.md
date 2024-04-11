@@ -90,16 +90,22 @@ By default:
 ### TODOs
 
 * [ ] Attacks
-    * [ ] Phishing (liuqiyuan)
-    * [ ] Brute-force (liuqiyuan)
-    * [ ] csrf
+    * [ ] Phishing (liuqiyuan) (90%)
+    * [x] Brute-force (liuqiyuan)
+    * [ ] CSRF (liuqiyuan)
     * [ ] mitm (luzhaoyan)
-    * [ ] sql_injection (yangyiwen)
+    * [ ] sql_injection (yangyiwen) (50%)
     * [ ] credential_stuffing
     * [x] dos (luzhaoyan)
     * [ ] xss
+* [ ] Defense
+    * [ ] reCAPTCHA (wangzirui)
+    * [ ] Two-factor (liuqiyuan)
+    * [ ] DoS (luzhaoyan)
+    * [x] JWT (luzhaoyan)
 * [ ] Website
     * [ ] backend
+        * [ ] flag for unsafe and safe mode (luzhaoyan)
         * [X] ticket (wangzirui)
         * [X] cart (wangzirui)
         * [ ] comments(optional)
