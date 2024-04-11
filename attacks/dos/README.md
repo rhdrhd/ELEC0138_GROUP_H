@@ -2,12 +2,12 @@
 
 We focus on two types of DoS attacks.
 
-* HTTP Flooding
+* TCP Flooding
 * (Optional) SYN Flooding
 
-## HTTP Flooding
+## TCP Flooding
 
-We simply use `http_flooding.py` to conduct our attack.
+We simply use `flooding.py` to conduct our attack.
 
 ## SYN Flooding
 
