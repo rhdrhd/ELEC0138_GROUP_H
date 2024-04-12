@@ -9,6 +9,7 @@ from constants import (
     APP_SECRET_KEY,
     API_PREFIX,
     USER_DATABASE_FILENAME,
+    USER_UNSAFE_DATABASE_FILENAME,
     VENUE_DATABASE_FILENAME,
     DEFAULT_TOKEN_EXPIRATION_MINUTES,
     RESPONSE_STATUS,
@@ -20,6 +21,7 @@ from flask_cors import CORS
 
 CWD = os.getcwd()
 USER_DATABASE_FILEPATH = os.path.join(CWD, USER_DATABASE_FILENAME)
+USER_UNSAFE_DATABASE_FILEPATH = os.path.join(CWD, USER_UNSAFE_DATABASE_FILENAME)
 VENUE_DATABASE_FILEPATH = os.path.join(CWD, VENUE_DATABASE_FILENAME)
 
 # Website version: Safe or Unsafe
@@ -79,8 +81,7 @@ def login():
             }
             return jsonify(response), 401
     else:
-        # weak version of sql injection
-        cur = get_sqlite_cursor(USER_DATABASE_FILEPATH)
+        cur = get_sqlite_cursor(USER_UNSAFE_DATABASE_FILEPATH)
         cur.execute(f"SELECT * FROM users WHERE username = '{username}' AND password = '{password}'")
         user = cur.fetchone()
         # raise NotImplementedError
@@ -120,7 +121,10 @@ def dashboard():
 
     # check username and password
     # USER_DATABASE_FILEPATH = os.path.join(CWD, USER_DATABASE_FILENAME)
-    cur = get_sqlite_cursor(USER_DATABASE_FILEPATH)
+    if IS_SAFE:
+        cur = get_sqlite_cursor(USER_DATABASE_FILEPATH)
+    else:
+        cur = get_sqlite_cursor(USER_UNSAFE_DATABASE_FILEPATH)
     cur.execute("SELECT * FROM users WHERE username = ?", (payload["username"],))
     user = cur.fetchone()
     if user and user["password"] != payload["password"]:
