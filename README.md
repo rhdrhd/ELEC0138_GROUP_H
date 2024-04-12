@@ -104,7 +104,7 @@ By default:
     * [x] Brute-force (liuqiyuan)
     * [ ] CSRF (liuqiyuan)
     * [ ] mitm (luzhaoyan)
-    * [ ] sql_injection (yangyiwen) (50%)
+    * [x] sql_injection (yangyiwen)
     * [ ] credential_stuffing
     * [x] dos (luzhaoyan)
     * [ ] xss

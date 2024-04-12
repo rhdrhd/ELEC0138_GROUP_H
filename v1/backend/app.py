@@ -54,9 +54,7 @@ def login():
         from werkzeug.security import check_password_hash
 
         cur = get_sqlite_cursor(USER_DATABASE_FILEPATH)
-        # weak version of sql injection
-        cur.execute(f"SELECT * FROM users WHERE username = '{username}'")
-        # cur.execute("SELECT * FROM users WHERE username = ?", (username,))
+        cur.execute("SELECT * FROM users WHERE username = ?", (username,))
         user = cur.fetchone()
 
         if user and check_password_hash(user["password"], password):
@@ -81,8 +79,32 @@ def login():
             }
             return jsonify(response), 401
     else:
-        # TODO (yangyiwei or liuqiyuan): unsafe login
-        raise NotImplementedError
+        # weak version of sql injection
+        cur = get_sqlite_cursor(USER_DATABASE_FILEPATH)
+        cur.execute(f"SELECT * FROM users WHERE username = '{username}' AND password = '{password}'")
+        user = cur.fetchone()
+        # raise NotImplementedError
+        if user:
+            # Payload data that you want to encode within the JWT.
+            # Include claims like the user ID, expiration time, etc.
+            exp = datetime.datetime.utcnow() + datetime.timedelta(
+                minutes=DEFAULT_TOKEN_EXPIRATION_MINUTES
+            )
+            payload = {"username": username, "password": user["password"], "exp": exp}
+            token = gen_jwt_token(payload)
+
+            response = {
+                "status": RESPONSE_STATUS[0],
+                "msg": "User logged in successfully.",
+                "data": {"user": {"username": username}, "token": token},
+            }
+            return jsonify(response), 200
+        else:
+            response = {
+                "status": RESPONSE_STATUS[1],
+                "msg": "Login failed. Invalid username or password.",
+            }
+            return jsonify(response), 401
 
 
 @app.route(f"{API_PREFIX}/v1/dashboard", methods=["POST"])
