@@ -14,9 +14,11 @@ from constants import (
     RESPONSE_STATUS,
 )
 from database import get_sqlite_cursor
+from limiter import get_limiter
 
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+
 
 CWD = os.getcwd()
 USER_DATABASE_FILEPATH = os.path.join(CWD, USER_DATABASE_FILENAME)
@@ -28,9 +30,11 @@ IS_SAFE = True if os.environ.get("MODE", "safe").lower() == "safe" else False
 app = Flask(__name__)
 app.secret_key = APP_SECRET_KEY
 CORS(app)
+limiter = get_limiter(is_safe=IS_SAFE, app=app)
 
 
 @app.route(f"{API_PREFIX}/v1/venues", methods=["GET"])
+@limiter.limit("5 per second")
 def get_venues():
     cur = get_sqlite_cursor(VENUE_DATABASE_FILEPATH)
     cur.execute("SELECT * FROM venue")
@@ -45,6 +49,7 @@ def get_venues():
 
 
 @app.route(f"{API_PREFIX}/v1/login", methods=["POST"])
+@limiter.limit("5 per second")
 def login():
     req = request.get_json()
     username = req.get("username", "Unknown")
@@ -86,6 +91,7 @@ def login():
 
 
 @app.route(f"{API_PREFIX}/v1/dashboard", methods=["POST"])
+@limiter.limit("5 per second")
 def dashboard():
     # Get the Authorization header from the incoming request
     auth_header = request.headers.get("Authorization")
@@ -117,4 +123,4 @@ def dashboard():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", debug=True)
