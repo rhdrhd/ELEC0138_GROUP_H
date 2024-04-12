@@ -15,7 +15,7 @@ from constants import (
 )
 from database import get_sqlite_cursor
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, make_response
 from flask_cors import CORS
 
 CWD = os.getcwd()
@@ -49,14 +49,11 @@ def login():
     req = request.get_json()
     username = req.get("username", "Unknown")
     password = req.get("password", "")
-
     if IS_SAFE:
         from werkzeug.security import check_password_hash
 
         cur = get_sqlite_cursor(USER_DATABASE_FILEPATH)
-        # weak version of sql injection
-        cur.execute(f"SELECT * FROM users WHERE username = '{username}'")
-        # cur.execute("SELECT * FROM users WHERE username = ?", (username,))
+        cur.execute("SELECT * FROM users WHERE username = ?", (username,))
         user = cur.fetchone()
 
         if user and check_password_hash(user["password"], password):
@@ -82,16 +79,38 @@ def login():
             return jsonify(response), 401
     else:
         # TODO (yangyiwei or liuqiyuan): unsafe login
-        raise NotImplementedError
+        from werkzeug.security import check_password_hash
+        cur = get_sqlite_cursor(USER_DATABASE_FILEPATH)
+        # weak version of sql injection
+        cur.execute(f"SELECT * FROM users WHERE username = '{username}'")
+        user = cur.fetchone()
+        if user and check_password_hash(user["password"], password):
+            exp = datetime.datetime.utcnow() + datetime.timedelta(minutes=DEFAULT_TOKEN_EXPIRATION_MINUTES)
+            payload = {"username": username, "exp": exp}
+            token = gen_jwt_token(payload)
+            
+            response = make_response(jsonify({"status": RESPONSE_STATUS[0], "msg": "User logged in successfully."}))
+            response.set_cookie('auth_token', token, httponly=True)
+            return response
+        else:
+            return jsonify({"status": RESPONSE_STATUS[1], "msg": "Login failed. Invalid username or password."}), 401
+
 
 
 @app.route(f"{API_PREFIX}/v1/dashboard", methods=["POST"])
 def dashboard():
-    # Get the Authorization header from the incoming request
-    auth_header = request.headers.get("Authorization")
-    err, token = validate_header(auth_header)
-    if err:
-        return jsonify(err)
+    if IS_SAFE:
+        token = request.cookies.get('auth_token')
+        print(token)
+        # Get the Authorization header from the incoming request
+        auth_header = request.headers.get("Authorization")
+        err, token = validate_header(auth_header)
+        if err:
+            return jsonify(err)
+    else:
+        print("getting token")
+        token = request.cookies.get('auth_token')
+        print(token)
     err, payload = validate_and_decode_jwt(token)
     if err:
         return jsonify(err)
@@ -114,6 +133,51 @@ def dashboard():
             "data": {"user": {"username": payload["username"]}},
         }
     return jsonify(response), 200
+
+
+@app.route('/api/v1/update-profile', methods=['POST'])
+def update_profile():
+    # get jwt token from cookie
+    token = request.cookies.get('auth_token')
+    if not token:
+        return jsonify({"status": "error", "msg": "Unauthorized. No token provided."}), 401
+    
+    # validate and decode jwt token
+    err, payload = validate_and_decode_jwt(token)
+    if err:
+        return jsonify(err), 401
+    
+    # check username and password
+    cur = get_sqlite_cursor(USER_DATABASE_FILEPATH)
+    cur.execute("SELECT * FROM users WHERE username = ?", (payload["username"],))
+    user = cur.fetchone()
+    if user and user["password"] != payload["password"]:
+        response = {
+            "status": RESPONSE_STATUS[1],
+            "msg": f"Invalid username or password. Please login again.",
+        }
+        return jsonify(response), 401
+    else:
+        response = {
+            "status": RESPONSE_STATUS[0],
+            "msg": "Dashboard",
+            "data": {"user": {"username": payload["username"]}},
+        }
+
+    # update user profile in database
+    new_email = request.form.get('email')
+    cur.execute("UPDATE users SET email = ? WHERE username = ?",
+                (new_email, payload["username"]))
+    cur.connection.commit()
+
+    return jsonify({
+        'status': 'success',
+        'msg': 'Profile updated successfully.',
+        'data': {
+            'username': payload["username"],
+            'email': new_email
+        }
+    }), 200
 
 
 if __name__ == "__main__":
