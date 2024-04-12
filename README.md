@@ -115,7 +115,7 @@ By default:
     * [x] JWT (luzhaoyan)
 * [ ] Website
     * [ ] backend
-        * [ ] flag for unsafe and safe mode (luzhaoyan)
+        * [x] unsafe and safe modes (luzhaoyan)
         * [X] ticket (wangzirui)
         * [X] cart (wangzirui)
         * [ ] comments(optional)
