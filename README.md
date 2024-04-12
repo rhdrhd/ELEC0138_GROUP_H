@@ -6,8 +6,8 @@
   - [Contents](#contents)
   - [Prerequisites](#prerequisites)
   - [Environment Setup](#environment-setup)
-    - [Frontend](#frontend)
     - [Backend](#backend)
+    - [Frontend](#frontend)
     - [Database](#database)
     - [Debugging](#debugging)
     - [TODOs](#todos)
@@ -18,32 +18,13 @@
 * [Anaconda](https://www.anaconda.com/) / [Miniconda](https://docs.anaconda.com/free/miniconda/index.html) for python 3.8
 
 ## Environment Setup
+
 We offer two versions of our ticket sales website.
-One is the original version (v1) which may have some security risks and vulnerabilities,
-and the other is a newer version (v2) that incorporates numerous mechanisms to safeguard the system.
 
-To access each version of the website, you'll need to navigate to the respective directory first.
+One is the unsafe mode which may have some security risks and vulnerabilities,
+and the other is a safe mode that incorporates numerous mechanisms to safeguard the system.
 
-```bash
-$ cd v1
-# or
-$ cd v2
-```
-
-### Frontend
-
-We are using [Vue.js](https://vuejs.org/guide/quick-start) to create our frontend website.
-
-Open a new terminal and run:
-
-```bash
-# cd v1 or v2
-$ cd frontend
-$ npm install
-$ npm run dev
-```
-
-And then you can visit our ticket selling website through `http://localhost:5173`.
+You can change the website's mode using different options.
 
 ### Backend
 
@@ -52,7 +33,6 @@ We are using [Flask](https://flask.palletsprojects.com/en/3.0.x/) to create our 
 Open a new terminal and run:
 
 ```bash
-# cd v1 or v2
 $ make create-env
 # or
 $ conda env create -f environment.yml
@@ -67,12 +47,42 @@ $ conda activate security
 To run the website:
 
 ```bash
-# cd v1 or v2
-$ cd backend
+$ cd v1/backend
+# Safe mode (default)
 $ python app.py
+# Unsafe mode
+$ MODE=unsafe python app.py
 ```
 
 The backend server's URL is `http://127.0.0.1:5000`.
+
+### Frontend
+
+We are using [Vue.js](https://vuejs.org/guide/quick-start) to create our frontend website.
+
+Open a new terminal and run:
+
+```bash
+$ cd v1/frontend
+
+# Install all dependencies needed
+$ npm install
+
+# Choose your website mode
+# Safe mode (default)
+$ cat v1/frontend/.env.development
+...
+VITE_APP_MODE=safe
+# Unsafe mode
+$ cat v1/frontend/.env.development
+...
+VITE_APP_MODE=unsafe
+
+# Launch your website
+$ npm run dev
+```
+
+And then you can visit our ticket selling website through `http://localhost:5173`.
 
 ### Database
 
@@ -105,7 +115,7 @@ By default:
     * [x] JWT (luzhaoyan)
 * [ ] Website
     * [ ] backend
-        * [ ] flag for unsafe and safe mode (luzhaoyan)
+        * [x] unsafe and safe modes (luzhaoyan)
         * [X] ticket (wangzirui)
         * [X] cart (wangzirui)
         * [ ] comments(optional)
