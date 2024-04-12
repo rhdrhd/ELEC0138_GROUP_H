@@ -12,6 +12,7 @@ DEFAULT_TOKEN_EXPIRATION_MINUTES = 5
 # Database for users
 # Assuming you have a SQLite DB named 'users.db' with a table 'users' (id, username, password)
 USER_DATABASE_FILENAME = "user.db"
+USER_UNSAFE_DATABASE_FILENAME = "user_unsafe.db"
 VENUE_DATABASE_FILENAME = "venue.db"
 
 
