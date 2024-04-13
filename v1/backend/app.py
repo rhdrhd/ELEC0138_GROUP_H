@@ -27,7 +27,8 @@ IS_SAFE = True if os.environ.get("MODE", "safe").lower() == "safe" else False
 
 app = Flask(__name__)
 app.secret_key = APP_SECRET_KEY
-CORS(app)
+origins = ["http://localhost:5173"]
+CORS(app, supports_credentials=True, origins=origins)
 
 
 @app.route(f"{API_PREFIX}/v1/venues", methods=["GET"])
@@ -92,12 +93,9 @@ def login():
             payload = {"username": username, "password": user["password"], "exp": exp}
             token = gen_jwt_token(payload)
 
-            response = {
-                "status": RESPONSE_STATUS[0],
-                "msg": "User logged in successfully.",
-                "data": {"user": {"username": username}, "token": token},
-            }
-            return jsonify(response), 200
+            response = make_response(jsonify({"status": RESPONSE_STATUS[0], "msg": "User logged in successfully.", "data": {"user": {"username": username}, "token": token}}))
+            response.set_cookie('auth_token', token, httponly=True, samesite='None', secure=True, path='/')
+            return response
         else:
             response = {
                 "status": RESPONSE_STATUS[1],
@@ -109,17 +107,13 @@ def login():
 @app.route(f"{API_PREFIX}/v1/dashboard", methods=["POST"])
 def dashboard():
     if IS_SAFE:
-        token = request.cookies.get('auth_token')
-        print(token)
         # Get the Authorization header from the incoming request
         auth_header = request.headers.get("Authorization")
         err, token = validate_header(auth_header)
         if err:
             return jsonify(err)
     else:
-        print("getting token")
         token = request.cookies.get('auth_token')
-        print(token)
     err, payload = validate_and_decode_jwt(token)
     if err:
         return jsonify(err)
