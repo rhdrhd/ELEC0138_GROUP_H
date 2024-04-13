@@ -111,7 +111,7 @@ By default:
 * [ ] Defense
     * [ ] reCAPTCHA (wangzirui)
     * [ ] Two-factor (liuqiyuan)
-    * [ ] DoS (luzhaoyan)
+    * [x] DoS (luzhaoyan)
     * [x] JWT (luzhaoyan)
 * [ ] Website
     * [ ] backend

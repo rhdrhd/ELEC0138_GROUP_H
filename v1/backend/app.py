@@ -9,17 +9,24 @@ from constants import (
     APP_SECRET_KEY,
     API_PREFIX,
     USER_DATABASE_FILENAME,
+    USER_UNSAFE_DATABASE_FILENAME,
     VENUE_DATABASE_FILENAME,
     DEFAULT_TOKEN_EXPIRATION_MINUTES,
     RESPONSE_STATUS,
 )
 from database import get_sqlite_cursor
-
+from limiter import get_limiter
+from werkzeug.security import check_password_hash
+import sqlite3
 from flask import Flask, request, jsonify, make_response
 from flask_cors import CORS
+import jwt
+
+import requests
 
 CWD = os.getcwd()
 USER_DATABASE_FILEPATH = os.path.join(CWD, USER_DATABASE_FILENAME)
+USER_UNSAFE_DATABASE_FILEPATH = os.path.join(CWD, USER_UNSAFE_DATABASE_FILENAME)
 VENUE_DATABASE_FILEPATH = os.path.join(CWD, VENUE_DATABASE_FILENAME)
 
 # Website version: Safe or Unsafe
@@ -29,9 +36,11 @@ app = Flask(__name__)
 app.secret_key = APP_SECRET_KEY
 origins = ["http://localhost:5173"]
 CORS(app, supports_credentials=True, origins=origins)
+limiter = get_limiter(is_safe=IS_SAFE, app=app)
 
 
 @app.route(f"{API_PREFIX}/v1/venues", methods=["GET"])
+@limiter.limit("5 per second")
 def get_venues():
     cur = get_sqlite_cursor(VENUE_DATABASE_FILEPATH)
     cur.execute("SELECT * FROM venue")
@@ -46,13 +55,30 @@ def get_venues():
 
 
 @app.route(f"{API_PREFIX}/v1/login", methods=["POST"])
+@limiter.limit("5 per second")
 def login():
     req = request.get_json()
+    if not req:
+        return jsonify({'status': 'failed', 'msg': 'Bad request: No JSON body found'}), 400
+
     username = req.get("username", "Unknown")
     password = req.get("password", "")
-    if IS_SAFE:
-        from werkzeug.security import check_password_hash
+    recaptcha_response = req.get('g-recaptcha-response')
 
+    if recaptcha_response:
+        secret = "6Lczk7kpAAAAALmq7-J9ZIiEPuSz1Ko5CC-oKG03"
+        payload = {'secret': secret, 'response': recaptcha_response}
+        recaptcha_verify_url = "https://www.google.com/recaptcha/api/siteverify"
+        try:
+            verify_response = requests.post(recaptcha_verify_url, data=payload)
+            verify_result = verify_response.json()
+            print("reCAPTCHA API Response:", verify_result)  # Log the full API response
+            if not verify_result.get('success', False):
+                return jsonify({'status': 'failed', 'msg': 'reCAPTCHA verification failed'}), 401
+        except requests.RequestException as e:
+            return jsonify({'status': 'failed', 'msg': 'Failed to verify reCAPTCHA'}), 503
+
+    if IS_SAFE:
         cur = get_sqlite_cursor(USER_DATABASE_FILEPATH)
         cur.execute("SELECT * FROM users WHERE username = ?", (username,))
         user = cur.fetchone()
@@ -79,8 +105,7 @@ def login():
             }
             return jsonify(response), 401
     else:
-        # weak version of sql injection
-        cur = get_sqlite_cursor(USER_DATABASE_FILEPATH)
+        cur = get_sqlite_cursor(USER_UNSAFE_DATABASE_FILEPATH)
         cur.execute(f"SELECT * FROM users WHERE username = '{username}' AND password = '{password}'")
         user = cur.fetchone()
         # raise NotImplementedError
@@ -105,6 +130,7 @@ def login():
 
 
 @app.route(f"{API_PREFIX}/v1/dashboard", methods=["POST"])
+@limiter.limit("5 per second")
 def dashboard():
     if IS_SAFE:
         # Get the Authorization header from the incoming request
@@ -120,7 +146,10 @@ def dashboard():
 
     # check username and password
     # USER_DATABASE_FILEPATH = os.path.join(CWD, USER_DATABASE_FILENAME)
-    cur = get_sqlite_cursor(USER_DATABASE_FILEPATH)
+    if IS_SAFE:
+        cur = get_sqlite_cursor(USER_DATABASE_FILEPATH)
+    else:
+        cur = get_sqlite_cursor(USER_UNSAFE_DATABASE_FILEPATH)
     cur.execute("SELECT * FROM users WHERE username = ?", (payload["username"],))
     user = cur.fetchone()
     if user and user["password"] != payload["password"]:
@@ -184,4 +213,4 @@ def update_profile():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", debug=True)
