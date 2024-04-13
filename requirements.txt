@@ -3,3 +3,4 @@ Flask==3.0.2
 flask_cors==4.0.0
 pyjwt==2.8.0
 Flask-Limiter==3.5.1
+requests
