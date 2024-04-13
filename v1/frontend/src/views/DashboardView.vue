@@ -22,6 +22,7 @@ async function userDashboard() {
           'Content-Type': 'application/json',
           'Authorization': token.value,
         },
+        credentials: 'include',
       });
       const data = await response.json();
       resp.value = data
