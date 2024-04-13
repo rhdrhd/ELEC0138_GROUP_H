@@ -31,6 +31,7 @@ VENUE_DATABASE_FILEPATH = os.path.join(CWD, VENUE_DATABASE_FILENAME)
 
 # Website version: Safe or Unsafe
 IS_SAFE = True if os.environ.get("MODE", "safe").lower() == "safe" else False
+print(IS_SAFE)
 
 app = Flask(__name__)
 app.secret_key = APP_SECRET_KEY
@@ -140,6 +141,7 @@ def dashboard():
             return jsonify(err)
     else:
         token = request.cookies.get('auth_token')
+        print(token)
     err, payload = validate_and_decode_jwt(token)
     if err:
         return jsonify(err)
@@ -180,10 +182,15 @@ def update_profile():
         return jsonify(err), 401
     
     # check username and password
-    cur = get_sqlite_cursor(USER_DATABASE_FILEPATH)
+    if IS_SAFE:
+        cur = get_sqlite_cursor(USER_DATABASE_FILEPATH)
+    else:
+        cur = get_sqlite_cursor(USER_UNSAFE_DATABASE_FILEPATH)
     cur.execute("SELECT * FROM users WHERE username = ?", (payload["username"],))
     user = cur.fetchone()
     if user and user["password"] != payload["password"]:
+        print(user["password"])
+        print(payload["password"])
         response = {
             "status": RESPONSE_STATUS[1],
             "msg": f"Invalid username or password. Please login again.",
