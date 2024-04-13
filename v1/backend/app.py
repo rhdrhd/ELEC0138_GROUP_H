@@ -16,10 +16,13 @@ from constants import (
 )
 from database import get_sqlite_cursor
 from limiter import get_limiter
-
+from werkzeug.security import check_password_hash
+import sqlite3
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+import jwt
 
+import requests
 
 CWD = os.getcwd()
 USER_DATABASE_FILEPATH = os.path.join(CWD, USER_DATABASE_FILENAME)
@@ -54,12 +57,27 @@ def get_venues():
 @limiter.limit("5 per second")
 def login():
     req = request.get_json()
+    if not req:
+        return jsonify({'status': 'failed', 'msg': 'Bad request: No JSON body found'}), 400
+
     username = req.get("username", "Unknown")
     password = req.get("password", "")
+    recaptcha_response = req.get('g-recaptcha-response')
+
+    if recaptcha_response:
+        secret = "6Lczk7kpAAAAALmq7-J9ZIiEPuSz1Ko5CC-oKG03"
+        payload = {'secret': secret, 'response': recaptcha_response}
+        recaptcha_verify_url = "https://www.google.com/recaptcha/api/siteverify"
+        try:
+            verify_response = requests.post(recaptcha_verify_url, data=payload)
+            verify_result = verify_response.json()
+            print("reCAPTCHA API Response:", verify_result)  # Log the full API response
+            if not verify_result.get('success', False):
+                return jsonify({'status': 'failed', 'msg': 'reCAPTCHA verification failed'}), 401
+        except requests.RequestException as e:
+            return jsonify({'status': 'failed', 'msg': 'Failed to verify reCAPTCHA'}), 503
 
     if IS_SAFE:
-        from werkzeug.security import check_password_hash
-
         cur = get_sqlite_cursor(USER_DATABASE_FILEPATH)
         cur.execute("SELECT * FROM users WHERE username = ?", (username,))
         user = cur.fetchone()

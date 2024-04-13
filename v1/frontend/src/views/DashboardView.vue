@@ -82,3 +82,7 @@ onMounted(() => {
     </button>
   </div>
 </template>
+
+<style scoped>
+@import "@/assets/login.css";
+</style>
