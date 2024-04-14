@@ -1,0 +1,9 @@
+.review-body{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    /* Creates 4 columns */
+    gap: 20px;
+    /* Adjusts the space between grid items */
+    padding: 20px;
+    /* Adds some padding around the grid */
+}

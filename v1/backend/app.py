@@ -15,7 +15,7 @@ from constants import (
     DEFAULT_TOKEN_EXPIRATION_MINUTES,
     RESPONSE_STATUS,
 )
-from database import get_sqlite_cursor
+from database import get_sqlite_cursor, insert_new_review, get_sqlite_conn
 from limiter import get_limiter
 from send_email import send_email, clear_login_codes
 from werkzeug.security import check_password_hash
@@ -52,8 +52,59 @@ def get_venues():
     return jsonify({"status": RESPONSE_STATUS[0], "data": venues_list}), 200
 
 
-# TODO(xss, optional): comments
-# @app.route(f"{API_PREFIX}/v1/comments", methods=["POST"])
+@app.route(f"{API_PREFIX}/v1/review", methods=["POST"])
+@limiter.limit("5 per second")
+def add_review():
+    req = request.get_json()
+    if not req:
+        return (
+            jsonify(
+                {"status": RESPONSE_STATUS[1], "msg": "Bad request: No JSON body found"}
+            ),
+            400,
+        )
+    venue_id = req.get("venue_id", -1)
+    review_text = req.get("review_text", "")
+    date_today = datetime.datetime.today().strftime("%Y-%m-%d")
+    review_date = req.get("review_date", date_today)
+    rating = req.get("rating", 0)
+    if venue_id == -1:
+        return (
+            jsonify({"status": RESPONSE_STATUS[1], "msg": f"venue_id is not set."}),
+            401,
+        )
+    conn = get_sqlite_conn(VENUE_DATABASE_FILEPATH)
+    insert_new_review(conn, venue_id, review_text, rating, review_date)
+    return jsonify({"status": RESPONSE_STATUS[0], "msg": "A new review inserted!"}), 200
+
+
+@app.route(f"{API_PREFIX}/v1/details", methods=["POST"])
+@limiter.limit("5 per second")
+def get_details():
+    req = request.get_json()
+    if not req:
+        return (
+            jsonify(
+                {"status": RESPONSE_STATUS[1], "msg": "Bad request: No JSON body found"}
+            ),
+            400,
+        )
+
+    venue_id = req.get("id", -1)
+    if venue_id == -1:
+        return (
+            jsonify({"status": RESPONSE_STATUS[1], "msg": f"id is not set."}),
+            401,
+        )
+    cur = get_sqlite_cursor(VENUE_DATABASE_FILEPATH)
+    cur.execute("SELECT * FROM venue WHERE id = ?", venue_id)
+    row = cur.fetchone()
+    venue = dict(row)
+    cur.execute("SELECT * FROM reviews WHERE venue_id = ?", venue_id)
+    rows = [dict(row) for row in cur.fetchall()]
+    venue["reviews"] = rows
+    # Convert the venues to a list of dictionaries to make them JSON serializable
+    return jsonify({"status": RESPONSE_STATUS[0], "data": venue}), 200
 
 
 @app.route(f"{API_PREFIX}/v1/login", methods=["POST"])
@@ -61,25 +112,43 @@ def get_venues():
 def login():
     req = request.get_json()
     if not req:
-        return jsonify({'status': 'failed', 'msg': 'Bad request: No JSON body found'}), 400
+        return (
+            jsonify(
+                {"status": RESPONSE_STATUS[1], "msg": "Bad request: No JSON body found"}
+            ),
+            400,
+        )
 
     username = req.get("username", "Unknown")
     password = req.get("password", "")
-    recaptcha_response = req.get('g-recaptcha-response')
+    recaptcha_response = req.get("g-recaptcha-response")
 
     # verify reCAPTCHA response
     if recaptcha_response:
         secret = "6Lczk7kpAAAAALmq7-J9ZIiEPuSz1Ko5CC-oKG03"
-        payload = {'secret': secret, 'response': recaptcha_response}
+        payload = {"secret": secret, "response": recaptcha_response}
         recaptcha_verify_url = "https://www.google.com/recaptcha/api/siteverify"
         try:
             verify_response = requests.post(recaptcha_verify_url, data=payload)
             verify_result = verify_response.json()
             print("reCAPTCHA API Response:", verify_result)  # Log the full API response
-            if not verify_result.get('success', False):
-                return jsonify({'status': 'failed', 'msg': 'reCAPTCHA verification failed'}), 401
+            if not verify_result.get("success", False):
+                return (
+                    jsonify(
+                        {
+                            "status": RESPONSE_STATUS[1],
+                            "msg": "reCAPTCHA verification failed",
+                        }
+                    ),
+                    401,
+                )
         except requests.RequestException as e:
-            return jsonify({'status': 'failed', 'msg': 'Failed to verify reCAPTCHA'}), 503
+            return (
+                jsonify(
+                    {"status": RESPONSE_STATUS[1], "msg": "Failed to verify reCAPTCHA"}
+                ),
+                503,
+            )
 
     if IS_SAFE:
         cur = get_sqlite_cursor(USER_DATABASE_FILEPATH)
@@ -109,7 +178,9 @@ def login():
             return jsonify(response), 401
     else:
         cur = get_sqlite_cursor(USER_UNSAFE_DATABASE_FILEPATH)
-        cur.execute(f"SELECT * FROM users WHERE username = '{username}' AND password = '{password}'")
+        cur.execute(
+            f"SELECT * FROM users WHERE username = '{username}' AND password = '{password}'"
+        )
         user = cur.fetchone()
         # raise NotImplementedError
         if user:
@@ -121,8 +192,23 @@ def login():
             payload = {"username": username, "password": user["password"], "exp": exp}
             token = gen_jwt_token(payload)
 
-            response = make_response(jsonify({"status": RESPONSE_STATUS[0], "msg": "User logged in successfully.", "data": {"user": {"username": username}, "token": token}}))
-            response.set_cookie('auth_token', token, httponly=True, samesite='None', secure=True, path='/')
+            response = make_response(
+                jsonify(
+                    {
+                        "status": RESPONSE_STATUS[0],
+                        "msg": "User logged in successfully.",
+                        "data": {"user": {"username": username}, "token": token},
+                    }
+                )
+            )
+            response.set_cookie(
+                "auth_token",
+                token,
+                httponly=True,
+                samesite="None",
+                secure=True,
+                path="/",
+            )
             return response
         else:
             response = {
@@ -142,7 +228,7 @@ def dashboard():
         if err:
             return jsonify(err)
     else:
-        token = request.cookies.get('auth_token')
+        token = request.cookies.get("auth_token")
     err, payload = validate_and_decode_jwt(token)
     if err:
         return jsonify(err)
@@ -170,18 +256,26 @@ def dashboard():
     return jsonify(response), 200
 
 
-@app.route('/api/v1/update-profile', methods=['POST'])
+@app.route("/api/v1/update-profile", methods=["POST"])
 def update_profile():
     # get jwt token from cookie
-    token = request.cookies.get('auth_token')
+    token = request.cookies.get("auth_token")
     if not token:
-        return jsonify({"status": "error", "msg": "Unauthorized. No token provided."}), 401
-    
+        return (
+            jsonify(
+                {
+                    "status": RESPONSE_STATUS[1],
+                    "msg": "Unauthorized. No token provided.",
+                }
+            ),
+            401,
+        )
+
     # validate and decode jwt token
     err, payload = validate_and_decode_jwt(token)
     if err:
         return jsonify(err), 401
-    
+
     # check username and password
     if IS_SAFE:
         cur = get_sqlite_cursor(USER_DATABASE_FILEPATH)
@@ -203,19 +297,23 @@ def update_profile():
         }
 
     # update user profile in database
-    new_email = request.form.get('email')
-    cur.execute("UPDATE users SET email = ? WHERE username = ?",
-                (new_email, payload["username"]))
+    new_email = request.form.get("email")
+    cur.execute(
+        "UPDATE users SET email = ? WHERE username = ?",
+        (new_email, payload["username"]),
+    )
     cur.connection.commit()
 
-    return jsonify({
-        'status': 'success',
-        'msg': 'Profile updated successfully.',
-        'data': {
-            'username': payload["username"],
-            'email': new_email
-        }
-    }), 200
+    return (
+        jsonify(
+            {
+                "status": RESPONSE_STATUS[0],
+                "msg": "Profile updated successfully.",
+                "data": {"username": payload["username"], "email": new_email},
+            }
+        ),
+        200,
+    )
 
 # send login code to email
 @app.route(f"{API_PREFIX}/v1/send-login-code", methods=["POST"])
