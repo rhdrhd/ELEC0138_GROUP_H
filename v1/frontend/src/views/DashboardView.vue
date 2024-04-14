@@ -42,7 +42,34 @@ async function userDashboard() {
     }
   } else {
     // TODO (unsafe mode)
+    // now the same as safe mode
     console.warn("NotImplementedError: unsafe mode for dashboard API")
+    try {
+      token.value = 'Bearer ' + localStorage.getItem('userToken');
+      const response = await fetch(dashboard_api, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token.value,
+        },
+        credentials: 'include',
+      });
+      const data = await response.json();
+      resp.value = data
+      console.log(data);
+      if (response.ok) {
+        console.log("get /api/v1/dashboard response successfully")
+        username.value = data.data.user.username
+      } else if (response.status === 401) {
+        // Login failed, remove the token if it exists
+        localStorage.removeItem('userToken');
+        alert(data.msg); // Invalid login
+      } else {
+        alert(data.msg); // Error
+      }
+    } catch (error) {
+      console.error('Dashboard Page Error:', error);
+    }
   }
 }
 
@@ -54,7 +81,12 @@ function userLogout() {
     router.push('/login');
   } else {
     // TODO (unsafe mode)
+    // now the same as safe mode
     console.warn("NotImplementedError: unsafe mode for userLogout")
+    localStorage.removeItem('userToken');
+    token.value = '';
+    alert('User successfully logged out! See you next time!');
+    router.push('/login');
   }
 }
 
