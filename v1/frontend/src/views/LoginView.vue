@@ -28,34 +28,85 @@ const loadRecaptcha = () => {
   }
 }
 
+const sendLoginCode = async (email) => {
+      try {
+        await fetch(`${import.meta.env.VITE_APP_BACKEND_URL}/api/v1/send-login-code`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email }),
+        });
+      } catch (error) {
+        console.error('Error sending login code:', error);
+      }
+    };
+
 async function userLogin() {
-  if (!recaptchaToken.value) {
-    alert("Please complete the reCAPTCHA to login.");
-    return;
-  }
-  try {
-    const response = await fetch(login_api, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({
-        username: username.value,
-        password: password.value,
-        'g-recaptcha-response': recaptchaToken.value
-      }),
-    });
-    const data = await response.json();
-    resp.value = data;
-    if (response.ok) {
-      token.value = data.data.token;
-      localStorage.setItem('userToken', token.value);
-      router.push('/dashboard');
-    } else {
-      alert(data.msg); // Error or invalid login
+  if (app_mode == "safe"){
+    if (!recaptchaToken.value) {
+      alert("Please complete the reCAPTCHA to login.");
+      return;
     }
-  } catch (error) {
-    console.error('Login failed:', error);
-    alert('Login request failed. Please try again later.');
+    try {
+      const response = await fetch(login_api, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          username: username.value,
+          password: password.value,
+          'g-recaptcha-response': recaptchaToken.value
+        }),
+      });
+      const data = await response.json();
+      resp.value = data;
+      if (response.ok) {
+        token.value = data.data.token;
+        localStorage.setItem('userToken', token.value);
+        // router.push('/dashboard');
+        await sendLoginCode(data.data.email); // Send login code
+        localStorage.setItem('emailForVerification', data.data.email); // may have problem if stored in localStorage
+        router.push('/verify-code');
+      } else {
+        alert(data.msg); // Error or invalid login
+      }
+    } catch (error) {
+      console.error('Login failed:', error);
+      alert('Login request failed. Please try again later.');
+    }
+  }
+  else{
+    // TODO (unsafe mode)
+    try {
+      const response = await fetch(login_api, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: username.value,
+          password: password.value,
+        }),
+        credentials: 'include',
+      });
+      const data = await response.json();
+      resp.value = data
+      console.log(data);
+      if (response.ok) {
+        token.value = data.data.token
+        // We can get it by localStorage.getItem('userToken');
+        localStorage.setItem('userToken', token.value);
+        // navigate to dashboard after login
+        router.push('/dashboard')
+      } else {
+        alert(data.msg); // Error or invalid login
+      }
+    } catch (error) {
+      // Login failed, remove the token if it exists
+      localStorage.removeItem('userToken');
+      console.error('Login failed:', error);
+    }
+
+    console.warn("NotImplementedError: unsafe mode for userLogin")
   }
 }
 

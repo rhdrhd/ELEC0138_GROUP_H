@@ -46,13 +46,28 @@ const router = createRouter({
       component: () => import('../views/CartView.vue'),
       meta: { requiresAuth: false },
     },
+    {
+      path: '/verify-code',
+      name: 'verify-code',
+      component: () => import('../views/VerifyCodeView.vue'),
+      meta: { requiresAuth: false }
+    }
   ]
-})
+});
 
 router.beforeEach((to, from, next) => {
-  const isAuthenticated = localStorage.getItem('userToken'); // Or however you determine auth status
-  if (to.matched.some(record => record.meta.requiresAuth) && !isAuthenticated) {
-    next('/login');
+  const appMode = import.meta.env.VITE_APP_MODE;
+  const isAuthenticated = localStorage.getItem('userToken');
+  const isVerified = localStorage.getItem('isVerified');
+
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    if (!isAuthenticated) {
+      next('/login');
+    } else if (appMode === 'safe' && !isVerified) {
+      next('/verify-code');
+    } else {
+      next();
+    }
   } else {
     next();
   }
