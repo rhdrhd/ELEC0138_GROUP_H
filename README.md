@@ -107,7 +107,7 @@ By default:
     * [x] sql_injection (yangyiwen)
     * [ ] credential_stuffing
     * [x] dos (luzhaoyan)
-    * [ ] xss
+    * [ ] xss (luzhaoyan)
 * [ ] Defense
     * [ ] reCAPTCHA (wangzirui)
     * [ ] Two-factor (liuqiyuan)
