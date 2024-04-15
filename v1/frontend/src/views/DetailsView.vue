@@ -14,7 +14,12 @@
             <div v-for="review in reviews" :key="review.id">
                 <div class="review">
                     <span class="review-rating"> Rating: {{ review.rating }} stars </span>
-                    <p class="review-text"> {{ review.review_text }} </p>
+                    <div v-if="app_mode === 'safe'">
+                        <p class="review-text"> {{ review.review_text }}</p>
+                    </div>
+                    <div v-else>
+                        <p class="review-text" v-html="review.review_text"></p>
+                    </div>
                     <span class="review-date">Reviewed on: {{ review.review_date }} </span>
                 </div>
             </div>
@@ -48,6 +53,7 @@
 import { ref, onBeforeMount } from 'vue';
 import { useRoute } from 'vue-router'
 
+const app_mode = import.meta.env.VITE_APP_MODE;
 const route = useRoute()
 const venueId = ref(null)
 const venue = ref(null)
