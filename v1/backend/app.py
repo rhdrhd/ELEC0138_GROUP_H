@@ -63,8 +63,7 @@ def add_review():
         )
     venue_id = req.get("venue_id", -1)
     review_text = req.get("review_text", "")
-    date_today = datetime.datetime.today().strftime("%Y-%m-%d")
-    review_date = req.get("review_date", date_today)
+    review_date = req.get("review_date")
     rating = req.get("rating", 0)
     if venue_id == -1:
         return (
