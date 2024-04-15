@@ -102,24 +102,25 @@ By default:
 * [ ] Attacks
     * [ ] Phishing (liuqiyuan) (90%)
     * [x] Brute-force (liuqiyuan)
-    * [ ] CSRF (liuqiyuan)
+    * [x] CSRF (liuqiyuan)
     * [ ] mitm (luzhaoyan)
     * [x] sql_injection (yangyiwen)
     * [ ] credential_stuffing
     * [x] dos (luzhaoyan)
-    * [ ] xss (luzhaoyan)
+    * [x] xss (luzhaoyan)
 * [ ] Defense
-    * [ ] reCAPTCHA (wangzirui)
-    * [ ] Two-factor (liuqiyuan)
+    * [x] reCAPTCHA (wangzirui)
+    * [x] Two-factor (liuqiyuan)
     * [x] DoS (luzhaoyan)
     * [x] JWT (luzhaoyan)
+    * [x] xss (luzhaoyan)
 * [ ] Website
     * [ ] backend
         * [x] unsafe and safe modes (luzhaoyan)
         * [X] ticket (wangzirui)
         * [X] cart (wangzirui)
-        * [ ] comments(optional)
+        * [x] reviews (luzhaoyan)
     * [ ] frontend
         * [X] ticket (wangzirui)
         * [X] cart (wangzirui)
-        * [ ] comments(optional)
+        * [x] reviews (luzhaoyan)
