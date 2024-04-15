@@ -18,7 +18,7 @@ from constants import (
 from database import get_sqlite_cursor, insert_new_review, get_sqlite_conn
 from limiter import get_limiter
 from send_email import send_email, clear_login_codes
-from werkzeug.security import check_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 from flask import Flask, request, jsonify, make_response
 from flask_cors import CORS
 
@@ -34,7 +34,7 @@ IS_SAFE = True if os.environ.get("MODE", "safe").lower() == "safe" else False
 
 app = Flask(__name__)
 app.secret_key = APP_SECRET_KEY
-origins = ["http://localhost:5173"]
+origins = ["http://127.0.0.1:5173","http://localhost:5173"]
 CORS(app, supports_credentials=True, origins=origins)
 limiter = get_limiter(is_safe=IS_SAFE, app=app)
 
@@ -103,51 +103,92 @@ def get_details():
     # Convert the venues to a list of dictionaries to make them JSON serializable
     return jsonify({"status": RESPONSE_STATUS[0], "data": venue}), 200
 
+@app.route(f"{API_PREFIX}/v1/register", methods=["POST"])
+@limiter.limit("5 per minute")  # Adjust rate limiting as appropriate
+def register():
+    req = request.get_json()
+    if not req:
+        return jsonify({"status": RESPONSE_STATUS[1], "msg": "Bad request: No JSON body found"}), 400
+
+    username = req.get("username")
+    password = req.get("password")
+    email = req.get("email")
+
+    if not username or not password or not email:
+        return jsonify({"status": RESPONSE_STATUS[1], "msg": "Missing required fields"}), 400
+
+    # Check if the username or email already exists
+    conn = get_sqlite_conn(USER_DATABASE_FILEPATH)
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM users WHERE username = ? OR email = ?", (username, email))
+    if cur.fetchone():
+        return jsonify({"status": RESPONSE_STATUS[1], "msg": "Username or email already exists"}), 409
+
+    # Hash the password before storing it
+    hashed_password = generate_password_hash(password)
+
+    # Insert new user into the database
+    try:
+        cur.execute("INSERT INTO users (username, password, email) VALUES (?, ?, ?)", (username, hashed_password, email))
+        conn.commit()
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"status": RESPONSE_STATUS[1], "msg": "Failed to register user"}), 500
+    
+    # Send email notification
+    email_subject = "Welcome to Our Platform!"
+    email_body = f"Hello {username},\n\nThank you for registering at our site. We are glad to have you with us!"
+    send_email(email, email_subject, email_body)
+
+    return jsonify({"status": RESPONSE_STATUS[0], "msg": "User registered successfully"}), 201
+
+
 
 @app.route(f"{API_PREFIX}/v1/login", methods=["POST"])
 @limiter.limit("5 per second")
 def login():
-    req = request.get_json()
-    if not req:
-        return (
-            jsonify(
-                {"status": RESPONSE_STATUS[1], "msg": "Bad request: No JSON body found"}
-            ),
-            400,
-        )
-
-    username = req.get("username", "Unknown")
-    password = req.get("password", "")
-    recaptcha_response = req.get("g-recaptcha-response")
-
-    # verify reCAPTCHA response
-    if recaptcha_response:
-        secret = "6Lczk7kpAAAAALmq7-J9ZIiEPuSz1Ko5CC-oKG03"
-        payload = {"secret": secret, "response": recaptcha_response}
-        recaptcha_verify_url = "https://www.google.com/recaptcha/api/siteverify"
-        try:
-            verify_response = requests.post(recaptcha_verify_url, data=payload)
-            verify_result = verify_response.json()
-            print("reCAPTCHA API Response:", verify_result)  # Log the full API response
-            if not verify_result.get("success", False):
-                return (
-                    jsonify(
-                        {
-                            "status": RESPONSE_STATUS[1],
-                            "msg": "reCAPTCHA verification failed",
-                        }
-                    ),
-                    401,
-                )
-        except requests.RequestException as e:
-            return (
-                jsonify(
-                    {"status": RESPONSE_STATUS[1], "msg": "Failed to verify reCAPTCHA"}
-                ),
-                503,
-            )
 
     if IS_SAFE:
+        req = request.get_json()
+        if not req:
+            return (
+                jsonify(
+                    {"status": RESPONSE_STATUS[1], "msg": "Bad request: No JSON body found"}
+                ),
+                400,
+            )
+
+        username = req.get("username", "Unknown")
+        password = req.get("password", "")
+        recaptcha_response = req.get("g-recaptcha-response")
+
+        # verify reCAPTCHA response
+        if recaptcha_response:
+            secret = "6Lczk7kpAAAAALmq7-J9ZIiEPuSz1Ko5CC-oKG03"
+            payload = {"secret": secret, "response": recaptcha_response}
+            recaptcha_verify_url = "https://www.google.com/recaptcha/api/siteverify"
+            try:
+                verify_response = requests.post(recaptcha_verify_url, data=payload)
+                verify_result = verify_response.json()
+                print("reCAPTCHA API Response:", verify_result)  # Log the full API response
+                if not verify_result.get("success", False):
+                    return (
+                        jsonify(
+                            {
+                                "status": RESPONSE_STATUS[1],
+                                "msg": "reCAPTCHA verification failed",
+                            }
+                        ),
+                        401,
+                    )
+            except requests.RequestException as e:
+                return (
+                    jsonify(
+                        {"status": RESPONSE_STATUS[1], "msg": "Failed to verify reCAPTCHA"}
+                    ),
+                    503,
+                )
+
         cur = get_sqlite_cursor(USER_DATABASE_FILEPATH)
         cur.execute("SELECT * FROM users WHERE username = ?", (username,))
         user = cur.fetchone()
@@ -326,16 +367,24 @@ def update_profile():
 @limiter.limit("2 per minute", key_func=lambda: request.remote_addr)
 def send_login_code():
     req = request.get_json()
-    email = req.get("email")
-    if not email:
-        return jsonify({"status": "failed", "msg": "Email is required"}), 400
+    username = req.get("username")  # Expecting a username to fetch associated email
+    if not username:
+        return jsonify({"status": "failed", "msg": "Username is required"}), 400
+
+    # Fetch user's email from the database
+    cur = get_sqlite_cursor(USER_DATABASE_FILEPATH)
+    cur.execute("SELECT email FROM users WHERE username = ?", (username,))
+    user_info = cur.fetchone()
+    if not user_info or not user_info["email"]:
+        return jsonify({"status": "failed", "msg": "No such user or email missing"}), 404
+
+    email = user_info["email"]
 
     # Generate a 6-digit code for login
     code = random.randint(100000, 999999)
     send_email(email, "Your Login Code", f"Your Login Code is: {code}")
 
     # Store code in the database with expiration time
-    cur = get_sqlite_cursor(USER_DATABASE_FILEPATH)
     cur.execute(
         "INSERT INTO login_codes (email, code, expiration) VALUES (?, ?, datetime('now', '+5 minutes'))",
         (email, code),
@@ -351,35 +400,24 @@ def send_login_code():
 def verify_login_code():
     req = request.get_json()
     if not req:
-        return (
-            jsonify({"status": "failed", "msg": "Bad request: No JSON body found"}),
-            400,
-        )
+        return jsonify({"status": "failed", "msg": "Bad request: No JSON body found"}), 400
 
-    email = req.get("email")
     code = req.get("code")
+    if not code:
+        return jsonify({"status": "failed", "msg": "Code is required"}), 400
 
-    if not email or not code:
-        return jsonify({"status": "failed", "msg": "Email and code are required"}), 400
-
-    # verify login code
+    # Verify login code
     cur = get_sqlite_cursor(USER_DATABASE_FILEPATH)
     cur.execute(
-        "SELECT * FROM login_codes WHERE email = ? AND code = ? AND expiration > datetime('now')",
-        (email, code),
+        "SELECT * FROM login_codes WHERE code = ? AND expiration > datetime('now')",
+        (code,)
     )
     code_valid = cur.fetchone()
 
     if not code_valid:
-        return (
-            jsonify({"status": "failed", "msg": "Invalid or expired login code"}),
-            401,
-        )
+        return jsonify({"status": "failed", "msg": "Invalid or expired login code"}), 401
 
-    return (
-        jsonify({"status": "success", "msg": "Login code verified successfully"}),
-        200,
-    )
+    return jsonify({"status": "success", "msg": "Login code verified successfully"}), 200
 
 
 if __name__ == "__main__":
