@@ -1,6 +1,10 @@
 import smtplib
 import sqlite3
 import os
+import configparser
+config = configparser.ConfigParser()
+config.read('../../config.ini')
+
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from constants import (
@@ -13,8 +17,8 @@ USER_UNSAFE_DATABASE_FILEPATH = os.path.join(CWD, USER_UNSAFE_DATABASE_FILENAME)
 
 
 def send_email(receiver_email, subject, body):
-    sender_email = "elec0138h@gmail.com"
-    password = "klgr zefv vrzx zojz"
+    sender_email = config['email']['sender']
+    password = config['email']['password']
 
     message = MIMEMultipart()
     message["From"] = sender_email

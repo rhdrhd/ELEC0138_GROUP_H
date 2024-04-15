@@ -10,8 +10,6 @@ const login_api = backend_url + '/api/v1/login'
 const username = ref('')
 const password = ref('')
 const token = ref('')
-const isDebug = ref(false)
-const resp = ref(null)
 
 async function userLogin() {
   try {
@@ -26,19 +24,14 @@ async function userLogin() {
       }),
     });
     const data = await response.json();
-    resp.value = data
-    console.log(data);
     if (response.ok) {
       token.value = data.data.token
-      // We can get it by localStorage.getItem('userToken');
       localStorage.setItem('userToken', token.value);
-      // navigate to dashboard after login
       router.push('/dashboard')
     } else {
       alert(data.msg); // Error or invalid login
     }
   } catch (error) {
-    // Login failed, remove the token if it exists
     localStorage.removeItem('userToken');
     console.error('Login failed:', error);
   }
@@ -59,18 +52,6 @@ onMounted(() => {
     <button @click.prevent="userLogin">
       Submit
     </button>
-  </div>
-  <div>
-    <button @click.prevent="isDebug = !isDebug">
-      Debug Mode
-    </button> isDebug: {{ isDebug }}
-    <div v-if="isDebug">
-      Debug info:
-      <li>username: {{ username }}</li>
-      <li>password: {{ password }}</li>
-      <li>response: {{ resp }}</li>
-      <li>token: {{ token }}</li>
-    </div>
   </div>
 </template>
 

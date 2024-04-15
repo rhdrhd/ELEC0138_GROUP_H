@@ -1,13 +1,17 @@
 import csv
 import smtplib
+import configparser
+config = configparser.ConfigParser()
+config.read('../../config.ini')
+
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
 victims_file = 'victim_list.csv'
-phishing_link = 'http://127.0.0.1:8001/'
+phishing_link = 'http://localhost:4001/'
 
-sender_email = input("Enter sender email: ")
-app_password = input("Enter sender gmail app password: ")
+sender_email = config['phishing_email']['sender']
+app_password = config['phishing_email']['password']
 
 msg = MIMEMultipart()
 msg["From"] = "Ticketing Service Support <support@ticketservice.com>"

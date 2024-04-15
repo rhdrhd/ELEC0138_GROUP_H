@@ -39,12 +39,6 @@ def get_venues():
     venues_list = [dict(venue) for venue in venues]
     return jsonify({"status": RESPONSE_STATUS[0], "data": venues_list}), 200
 
-# TODO: cart
-# @app.route(f"{API_PREFIX}/v1/cart", methods=["POST"])
-
-# TODO(xss, optional): comments
-# @app.route(f"{API_PREFIX}/v1/comments", methods=["POST"])
-
 # always login successfully
 @app.route(f"{API_PREFIX}/v1/login", methods=["POST"])
 def login():
@@ -75,32 +69,11 @@ def login():
 
 @app.route(f"{API_PREFIX}/v1/dashboard", methods=["POST"])
 def dashboard():
-    # Get the Authorization header from the incoming request
-    auth_header = request.headers.get("Authorization")
-    err, token = validate_header(auth_header)
-    if err:
-        return jsonify(err)
-    err, payload = validate_and_decode_jwt(token)
-    if err:
-        return jsonify(err)
-
-    # check username and password
-    #USER_DATABASE_FILEPATH = os.path.join(CWD, USER_DATABASE_FILENAME)
-    cur = get_sqlite_cursor(USER_DATABASE_FILEPATH)
-    cur.execute("SELECT * FROM users WHERE username = ?", (payload["username"],))
-    user = cur.fetchone()
-    if user and user["password"] != payload["password"]:
-        response = {
-            "status": RESPONSE_STATUS[1],
-            "msg": f"Invalid username or password. Please login again.",
-        }
-        return jsonify(response), 401
-    else:
-        response = {
-            "status": RESPONSE_STATUS[0],
-            "msg": "Dashboard",
-            "data": {"user": {"username": payload["username"]}},
-        }
+    response = {
+        "status": RESPONSE_STATUS[0],
+        "msg": "Dashboard",
+        "data": {"user": {"username": 'user'}},
+    }
     return jsonify(response), 200
 
 
