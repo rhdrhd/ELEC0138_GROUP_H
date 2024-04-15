@@ -23,7 +23,7 @@ export default {
       if (email) {
         const parts = email.split('@');
         const local = parts[0];
-        const maskedLocal = local.length > 3 ? `${local.substring(0,3)}***` : `${local[0]}**`;
+        const maskedLocal = local.length > 3 ? `${local.substring(0, 3)}***` : `${local[0]}**`;
         return `${maskedLocal}@${parts[1]}`;
       }
       return '';
@@ -73,7 +73,8 @@ export default {
   padding: 20px;
 }
 
-input, button {
+input,
+button {
   margin: 10px;
   padding: 10px;
   width: 300px;

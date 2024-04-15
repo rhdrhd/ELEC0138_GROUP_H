@@ -16,3 +16,18 @@ def get_sqlite_cursor(database_filepath: str) -> sqlite3.Cursor:
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
     return cur
+
+
+def insert_new_review(conn, venue_id, review_text, rating, review_date):
+    try:
+        conn.execute(
+            """
+            INSERT INTO reviews (venue_id, review_text, rating, review_date)
+            VALUES (?, ?, ?, ?)
+        """,
+            (venue_id, review_text, rating, review_date),
+        )
+        conn.commit()
+        print("Review added successfully!")
+    except sqlite3.IntegrityError as e:
+        print("Failed to add review:", e)
