@@ -76,6 +76,10 @@ async function userDashboard() {
 function userLogout() {
   if (app_mode == "safe") {
     localStorage.removeItem('userToken');
+    localStorage.removeItem('isVerified');
+    localStorage.removeItem('username');
+    localStorage.removeItem('usernameForVerification');
+    localStorage.removeItem('emailForVerification');
     token.value = '';
     alert('User successfully logged out! See you next time!');
     router.push('/login');
