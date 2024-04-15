@@ -1,114 +1,134 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
 const backend_url = import.meta.env.VITE_APP_BACKEND_URL;
 const login_api = `${backend_url}/api/v1/login`;
+const register_api = `${backend_url}/api/v1/register`;
 const app_mode = import.meta.env.VITE_APP_MODE;
 
 const username = ref('');
+const email = ref('');
 const password = ref('');
+const confirmPassword = ref('');
 const token = ref('');
 const isDebug = ref(false);
 const resp = ref(null);
-const recaptchaToken = ref(null);  // Store the reCAPTCHA token here
+const recaptchaToken = ref(null);
 const recaptchaId = ref(null);
+const mode = ref('login'); // Toggle between 'login' and 'register'
 
 const loadRecaptcha = () => {
-  if (window.grecaptcha && window.grecaptcha.render) {
-    if (recaptchaId.value === null) {
-      recaptchaId.value = grecaptcha.render('recaptcha-element', {
-        'sitekey': '6Lczk7kpAAAAANd46AiA8tL82izCtQy2MvUA5Oug', // replace with your actual site key
-        'callback': (token) => { recaptchaToken.value = token; }  // Store the token, don't login immediately
-      });
+  nextTick(() => { // Ensure this is called after DOM updates
+    const element = document.getElementById('recaptcha-element');
+    if (element && window.grecaptcha) {
+      if (recaptchaId.value === null) {
+        recaptchaId.value = grecaptcha.render(element, {
+          'sitekey': '6Lczk7kpAAAAANd46AiA8tL82izCtQy2MvUA5Oug',
+          'callback': (token) => { recaptchaToken.value = token; }
+        });
+      } else {
+        grecaptcha.reset(recaptchaId.value); // Reset before rendering again
+        recaptchaId.value = grecaptcha.render(element, {
+          'sitekey': '6Lczk7kpAAAAANd46AiA8tL82izCtQy2MvUA5Oug',
+          'callback': (token) => { recaptchaToken.value = token; }
+        });
+      }
+    } else {
+      console.error('reCAPTCHA library not loaded or element not found.');
     }
-  } else {
-    console.error('reCAPTCHA library not loaded.');
+  });
+}
+
+watch(mode, () => {
+  if (recaptchaId.value !== null) {
+    grecaptcha.reset(recaptchaId.value); // Ensure it's cleared when mode changes
+    recaptchaId.value = null;
+  }
+  loadRecaptcha();
+}, { immediate: true });
+
+const sendLoginCode = async (username) => {
+  try {
+    const response = await fetch(`${import.meta.env.VITE_APP_BACKEND_URL}/api/v1/send-login-code`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: username }),
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.msg);
+    }
+  } catch (error) {
+    console.error('Error sending login code:', error);
+    alert('Failed to send login code: ' + error.message);
   }
 }
 
-const sendLoginCode = async (email) => {
-  try {
-    await fetch(`${import.meta.env.VITE_APP_BACKEND_URL}/api/v1/send-login-code`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: email }),
-    });
-  } catch (error) {
-    console.error('Error sending login code:', error);
-  }
-};
 
-async function userLogin() {
+const userLogin = async () => {
   if (app_mode == "safe") {
     if (!recaptchaToken.value) {
       alert("Please complete the reCAPTCHA to login.");
       return;
     }
-    try {
-      const response = await fetch(login_api, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({
-          username: username.value,
-          password: password.value,
-          'g-recaptcha-response': recaptchaToken.value
-        }),
-      });
-      const data = await response.json();
-      resp.value = data;
-      if (response.ok) {
-        token.value = data.data.token;
-        localStorage.setItem('userToken', token.value);
-        // router.push('/dashboard');
-        await sendLoginCode(data.data.email); // Send login code
-        localStorage.setItem('emailForVerification', data.data.email); // may have problem if stored in localStorage
-        router.push('/verify-code');
-      } else {
-        alert(data.msg); // Error or invalid login
-      }
-    } catch (error) {
-      console.error('Login failed:', error);
-      alert('Login request failed. Please try again later.');
-    }
   }
-  else {
-    // TODO (unsafe mode)
-    try {
-      const response = await fetch(login_api, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          username: username.value,
-          password: password.value,
-        }),
-        credentials: 'include',
-      });
-      const data = await response.json();
-      resp.value = data
-      console.log(data);
-      if (response.ok) {
-        token.value = data.data.token
-        // We can get it by localStorage.getItem('userToken');
-        localStorage.setItem('userToken', token.value);
-        // navigate to dashboard after login
-        router.push('/dashboard')
-      } else {
-        alert(data.msg); // Error or invalid login
-      }
-    } catch (error) {
-      // Login failed, remove the token if it exists
-      localStorage.removeItem('userToken');
-      console.error('Login failed:', error);
+  try {
+    const response = await fetch(login_api, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({
+        username: username.value,
+        password: password.value,
+        'g-recaptcha-response': recaptchaToken.value
+      }),
+    });
+    const data = await response.json();
+    if (response.ok) {
+      token.value = data.data.token;
+      localStorage.setItem('userToken', token.value);
+      localStorage.setItem('usernameForVerification', username.value);  // Store username for sending the login code
+      await sendLoginCode(username.value);  // Now correctly passing username
+      router.push('/verify-code');
+    } else {
+      alert(data.msg);
     }
-
-    console.warn("NotImplementedError: unsafe mode for userLogin")
+  } catch (error) {
+    console.error('Login failed:', error);
+    alert('Login request failed. Please try again later.');
   }
 }
+
+const registerUser = async () => {
+  try {
+    const response = await fetch(register_api, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username: username.value,
+        email: email.value,
+        password: password.value,
+        confirmPassword: confirmPassword.value
+      }),
+    });
+    const data = await response.json();
+    resp.value = data;
+    if (response.ok) {
+      alert('Registration successful. Please check your email :3');
+      router.push('/login');
+    } else {
+      alert(data.message);
+    }
+  } catch (error) {
+    console.error('Registration failed:', error);
+    alert('Registration request failed. Please try again later.');
+  }
+}
+
+
+
 
 onMounted(() => {
   if (app_mode === "safe" && localStorage.getItem('userToken') !== null) {
@@ -126,25 +146,30 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <h1>Login</h1>
-  <div>
-    <input v-model="username" type="text" placeholder="Username">
-    <input v-model="password" type="password" placeholder="Password">
+  <div v-if="mode === 'login'">
+    <h1>Login</h1>
+    <div class="input-container">
+      <div><input v-model="username" type="text" placeholder="Username"></div>
+      <div><input v-model="password" type="password" placeholder="Password"></div>
+    </div>
     <div id="recaptcha-element"></div>
-    <button @click.prevent="userLogin" class="login-button">Login</button>
-  </div>
-  <div>
-    <button @click.prevent="isDebug = !isDebug" class="login-button">Toggle Debug</button>
-    <div v-if="isDebug">
-      Debug Info:
-      <ul>
-        <li>Username: {{ username }}</li>
-        <li>Password: {{ password }}</li>
-        <li>Response: {{ resp }}</li>
-        <li>Token: {{ token }}</li>
-      </ul>
+    <div class="button-container">
+      <button @click.prevent="userLogin" class="login-button">Login</button>
+      <button @click.prevent="mode = 'register'" class="login-button">Register</button>
     </div>
   </div>
+  <div v-else>
+    <h1>Register</h1>
+    <div class="input-container">
+      <div><input v-model="username" type="text" placeholder="Username"></div>
+      <div><input v-model="email" type="email" placeholder="Email"></div>
+      <div><input v-model="password" type="password" placeholder="Password"></div>
+      <div><input v-model="confirmPassword" type="password" placeholder="Confirm Password"></div>
+    </div>
+    <div> <button @click.prevent="registerUser" class="login-button">Register</button> </div>
+    <button @click.prevent="mode = 'login'" class="login-button">Back to Login</button>
+  </div>
+
 </template>
 
 <style scoped>
