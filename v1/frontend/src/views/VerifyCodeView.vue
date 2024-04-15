@@ -4,9 +4,11 @@
     <p class="email-hint">A verification code has been sent to your email: <strong>{{ maskedEmail }}</strong>.</p>
     <input v-model="code" type="text" placeholder="Enter the verification code" @keyup.enter="verifyCode">
     <button @click="verifyCode">Verify</button>
+    <button @click="handleReturn" class="return-button">Return to Login</button>
     <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
   </div>
 </template>
+
 
 <script>
 import { ref, computed } from 'vue';
@@ -52,12 +54,23 @@ export default {
         errorMessage.value = 'Verification failed. Please try again later.';
       }
     };
+    
+    const handleReturn = () => {
+      localStorage.removeItem('userToken');
+      localStorage.removeItem('usernameForVerification');
+      localStorage.removeItem('emailForVerification');
+      localStorage.removeItem('isVerified');
+      localStorage.removeItem('username');
+
+      router.push('/login');
+    };
 
     return {
       code,
       verifyCode,
       errorMessage,
-      maskedEmail
+      maskedEmail,
+      handleReturn
     };
   }
 }
@@ -79,6 +92,14 @@ button {
   padding: 10px;
   width: 300px;
   font-size: 16px;
+  border: 1px solid #ccc; /* Add border to match the original button style */
+  background-color: #fff; /* Background color */
+  color: #333; /* Text color */
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #f3f4f6; /* Slightly different background on hover */
 }
 
 .email-hint {
@@ -92,3 +113,4 @@ button {
   margin-top: 20px;
 }
 </style>
+

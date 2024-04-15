@@ -90,6 +90,7 @@ const userLogin = async () => {
       token.value = data.data.token;
       localStorage.setItem('userToken', token.value);
       localStorage.setItem('usernameForVerification', username.value);  // Store username for sending the login code
+      localStorage.setItem('emailForVerification', data.data.email);  // Store email for verification
       await sendLoginCode(username.value);  // Now correctly passing username
       router.push('/verify-code');
     } else {
