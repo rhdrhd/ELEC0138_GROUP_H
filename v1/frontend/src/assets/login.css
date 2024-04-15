@@ -14,7 +14,7 @@ li {
 }
 
 input {
-  margin: 0.5rem 0;
+  margin: 1rem 0;
   /* Add some space above and below input fields */
   padding: 0.5rem;
   /* Add padding inside input fields for better visual and typing experience */
@@ -51,4 +51,10 @@ input {
 .login-button:active {
   background-color: #eaedf1;
   transform: scale(0.95);
+}
+
+
+.button-container {
+  display: flex;
+  justify-content: space-between; /* Distributes space evenly between the buttons */
 }
