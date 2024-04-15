@@ -1,7 +1,7 @@
 <template>
   <div class="verify-code-container">
     <h1>Verify Your Email</h1>
-    <p class="email-hint">A verification code has been sent to your email registered!</p>
+    <p class="email-hint">A verification code has been sent to your email: <strong>{{ maskedEmail }}</strong>.</p>
     <input v-model="code" type="text" placeholder="Enter the verification code" @keyup.enter="verifyCode">
     <button @click="verifyCode">Verify</button>
     <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
