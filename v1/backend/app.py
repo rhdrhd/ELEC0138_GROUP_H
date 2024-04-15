@@ -19,10 +19,8 @@ from database import get_sqlite_cursor, insert_new_review, get_sqlite_conn
 from limiter import get_limiter
 from send_email import send_email, clear_login_codes
 from werkzeug.security import check_password_hash
-import sqlite3
 from flask import Flask, request, jsonify, make_response
 from flask_cors import CORS
-import jwt
 
 import requests
 
@@ -164,11 +162,19 @@ def login():
             payload = {"username": username, "password": user["password"], "exp": exp}
             token = gen_jwt_token(payload)
             email = user["email"]
-            response = make_response(jsonify({
-                "status": RESPONSE_STATUS[0],
-                "msg": "User logged in successfully.",
-                "data": {"user": {"username": username}, "token": token, "email": email},
-            })) 
+            response = make_response(
+                jsonify(
+                    {
+                        "status": RESPONSE_STATUS[0],
+                        "msg": "User logged in successfully.",
+                        "data": {
+                            "user": {"username": username},
+                            "token": token,
+                            "email": email,
+                        },
+                    }
+                )
+            )
             return response, 200
         else:
             response = {
@@ -315,6 +321,7 @@ def update_profile():
         200,
     )
 
+
 # send login code to email
 @app.route(f"{API_PREFIX}/v1/send-login-code", methods=["POST"])
 @limiter.limit("2 per minute", key_func=lambda: request.remote_addr)
@@ -322,7 +329,7 @@ def send_login_code():
     req = request.get_json()
     email = req.get("email")
     if not email:
-        return jsonify({'status': 'failed', 'msg': 'Email is required'}), 400
+        return jsonify({"status": "failed", "msg": "Email is required"}), 400
 
     # Generate a 6-digit code for login
     code = random.randint(100000, 999999)
@@ -330,10 +337,14 @@ def send_login_code():
 
     # Store code in the database with expiration time
     cur = get_sqlite_cursor(USER_DATABASE_FILEPATH)
-    cur.execute("INSERT INTO login_codes (email, code, expiration) VALUES (?, ?, datetime('now', '+5 minutes'))", (email, code))
+    cur.execute(
+        "INSERT INTO login_codes (email, code, expiration) VALUES (?, ?, datetime('now', '+5 minutes'))",
+        (email, code),
+    )
     cur.connection.commit()
 
-    return jsonify({'status': 'success', 'msg': 'Login code sent successfully'}), 200
+    return jsonify({"status": "success", "msg": "Login code sent successfully"}), 200
+
 
 # verify email and login code
 @app.route(f"{API_PREFIX}/v1/verify-login-code", methods=["POST"])
@@ -341,23 +352,35 @@ def send_login_code():
 def verify_login_code():
     req = request.get_json()
     if not req:
-        return jsonify({'status': 'failed', 'msg': 'Bad request: No JSON body found'}), 400
-    
+        return (
+            jsonify({"status": "failed", "msg": "Bad request: No JSON body found"}),
+            400,
+        )
+
     email = req.get("email")
     code = req.get("code")
-    
+
     if not email or not code:
-        return jsonify({'status': 'failed', 'msg': 'Email and code are required'}), 400
-    
+        return jsonify({"status": "failed", "msg": "Email and code are required"}), 400
+
     # verify login code
     cur = get_sqlite_cursor(USER_DATABASE_FILEPATH)
-    cur.execute("SELECT * FROM login_codes WHERE email = ? AND code = ? AND expiration > datetime('now')", (email, code))
+    cur.execute(
+        "SELECT * FROM login_codes WHERE email = ? AND code = ? AND expiration > datetime('now')",
+        (email, code),
+    )
     code_valid = cur.fetchone()
-    
-    if not code_valid:
-        return jsonify({'status': 'failed', 'msg': 'Invalid or expired login code'}), 401
 
-    return jsonify({'status': 'success', 'msg': 'Login code verified successfully'}), 200
+    if not code_valid:
+        return (
+            jsonify({"status": "failed", "msg": "Invalid or expired login code"}),
+            401,
+        )
+
+    return (
+        jsonify({"status": "success", "msg": "Login code verified successfully"}),
+        200,
+    )
 
 
 if __name__ == "__main__":

@@ -29,19 +29,19 @@ const loadRecaptcha = () => {
 }
 
 const sendLoginCode = async (email) => {
-      try {
-        await fetch(`${import.meta.env.VITE_APP_BACKEND_URL}/api/v1/send-login-code`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: email }),
-        });
-      } catch (error) {
-        console.error('Error sending login code:', error);
-      }
-    };
+  try {
+    await fetch(`${import.meta.env.VITE_APP_BACKEND_URL}/api/v1/send-login-code`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email }),
+    });
+  } catch (error) {
+    console.error('Error sending login code:', error);
+  }
+};
 
 async function userLogin() {
-  if (app_mode == "safe"){
+  if (app_mode == "safe") {
     if (!recaptchaToken.value) {
       alert("Please complete the reCAPTCHA to login.");
       return;
@@ -74,7 +74,7 @@ async function userLogin() {
       alert('Login request failed. Please try again later.');
     }
   }
-  else{
+  else {
     // TODO (unsafe mode)
     try {
       const response = await fetch(login_api, {
@@ -131,7 +131,7 @@ onUnmounted(() => {
     <input v-model="username" type="text" placeholder="Username">
     <input v-model="password" type="password" placeholder="Password">
     <div id="recaptcha-element"></div>
-    <button @click.prevent="userLogin"class="login-button">Login</button>
+    <button @click.prevent="userLogin" class="login-button">Login</button>
   </div>
   <div>
     <button @click.prevent="isDebug = !isDebug" class="login-button">Toggle Debug</button>
