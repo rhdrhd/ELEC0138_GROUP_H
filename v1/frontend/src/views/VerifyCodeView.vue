@@ -60,7 +60,6 @@ export default {
       localStorage.removeItem('usernameForVerification');
       localStorage.removeItem('emailForVerification');
       localStorage.removeItem('isVerified');
-      localStorage.removeItem('username');
 
       router.push('/login');
     };

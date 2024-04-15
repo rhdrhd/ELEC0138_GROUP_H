@@ -125,7 +125,7 @@ def register():
         return jsonify({"status": RESPONSE_STATUS[1], "msg": "Username or email already exists"}), 409
 
     # Hash the password before storing it
-    hashed_password = generate_password_hash(password)
+    hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
 
     # Insert new user into the database
     try:
@@ -297,9 +297,47 @@ def dashboard():
         response = {
             "status": RESPONSE_STATUS[0],
             "msg": "Dashboard",
-            "data": {"user": {"username": payload["username"]}},
+            "data": {"user": {"username": payload["username"], "email": user["email"]}},
         }
     return jsonify(response), 200
+
+@app.route('/update_user', methods=['POST'])
+@limiter.limit("5 per minute")
+def update_user():
+    data = request.json
+    username = data['username']
+    field = data['field']
+    new_value = data['new_value']
+
+    if field not in ['username', 'email', 'password']:
+        return jsonify({'msg': 'Invalid field'}), 400
+
+    conn = get_sqlite_conn(USER_DATABASE_FILEPATH)
+    cur = conn.cursor()
+
+    if field == 'password':
+        new_value = generate_password_hash(new_value, method='pbkdf2:sha256')
+
+    cur.execute(f"UPDATE users SET {field} = ? WHERE username = ?", (new_value, username))
+    conn.commit()
+    conn.close()
+    
+    return jsonify({'msg': 'User updated successfully'}), 200
+
+@app.route('/delete_user', methods=['POST'])
+@limiter.limit("5 per minute")
+def delete_user():
+    username = request.json.get('username')
+    if not username:
+        return jsonify({'msg': 'Username is required'}), 400
+
+    conn = get_sqlite_conn(USER_DATABASE_FILEPATH)
+    cur = conn.cursor()
+    cur.execute("DELETE FROM users WHERE username = ?", (username,))
+    conn.commit()
+    conn.close()
+
+    return jsonify({'msg': 'User deleted successfully'}), 200
 
 
 @app.route("/api/v1/update-profile", methods=["POST"])
