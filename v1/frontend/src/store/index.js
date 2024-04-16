@@ -4,9 +4,13 @@ export default createStore({
   state() {
     return {
       cart: [],
+      balance: 0,
     };
   },
   mutations: {
+    updateBalance(state, newBalance) {
+      state.balance = newBalance;
+    },
     addToCart(state, { item, quantityToAdd }) {
       const existingItem = state.cart.find(cartItem => cartItem.id === item.id);
       if (existingItem) {
@@ -35,16 +39,26 @@ export default createStore({
         state.cart.splice(index, 1);
       }
     },
+    clearCart(state) {
+      state.cart = [];
+    },
   },
   actions: {
+    setBalance({ commit }, balance) {
+      commit('updateBalance', balance);
+    },
     addToCart({ commit }, item) {
       commit('addToCart', item);
     },
     removeFromCart({ commit }, itemId) {
       commit('removeFromCart', itemId);
     },
+    clearCart({ commit }) {
+      commit('clearCart');
+    },
   },
   getters: {
+    getBalance: (state) => state.balance,
     cartItems(state) {
       return state.cart;
     },

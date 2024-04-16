@@ -18,6 +18,13 @@
       <div class="cart-total">
         <h2>Total: ${{ totalCost }}</h2>
       </div>
+      <div class="cart-total">
+        <h2>Your Balance: ${{ getBalance }}</h2>
+      </div>
+      <div class="cart-topup-checkout-container">
+        <button class="cart-top-up" @click="topUp()">Top Up</button>
+        <button class="cart-checkout" @click="checkout()">Checkout</button>
+      </div>
     </div>
     <div v-else>
       <p>Your cart is empty.</p>
@@ -32,24 +39,34 @@ import { mapActions, mapGetters } from 'vuex';
 export default {
   name: 'CartView',
   computed: {
-    ...mapGetters(['cartItems']),
+    ...mapGetters(['cartItems', 'getBalance']),
     totalCost() {
       console.log(this.cartItems);
-    return this.cartItems.reduce((total, item) => {
-      const price = Number(item.price);
-      const quantity = Number(item.quantity);
-      if (!isNaN(price) && !isNaN(quantity)) {
-        return total + price * quantity;
-      }
-      return total;
-    }, 0);
-  },
+      return this.cartItems.reduce((total, item) => {
+        const price = Number(item.price);
+        const quantity = Number(item.quantity);
+        if (!isNaN(price) && !isNaN(quantity)) {
+          return total + price * quantity;
+        }
+        return total;
+      }, 0);
+    },
   },
   methods: {
     ...mapActions(['removeFromCart']),
     removeItem(itemId) {
       this.removeFromCart(itemId);
     },
+    checkout() {
+      if (this.getBalance >= this.totalCost) {
+        this.$router.push('/payment');
+      } else {
+        alert("You don't have enough balance! Please top up first.");
+      }
+    },
+    topUp() {
+      this.$router.push('/topup');
+    }
   },
 };
 </script>
