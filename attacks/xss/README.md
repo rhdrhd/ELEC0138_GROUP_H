@@ -23,7 +23,7 @@ $ npm run dev
 3. Post a new review with the following content:
 
 ```
-<p onclick="alert('HELLOOOOOOOO!');"> DON'T Click me!</p>
+<p onclick="alert('WARNING: You are running a malicious script!!!!!');"> DON'T Click me!</p>
 ```
 
 4. Click the review
