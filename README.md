@@ -104,28 +104,27 @@ By default::
 
 ### TODOs
 
-* [ ] Attacks
-    * [ ] Phishing (liuqiyuan) (90%)
+* [x] Attacks
+    * [x] Phishing (liuqiyuan)
     * [x] Brute-force (liuqiyuan)
     * [x] CSRF (liuqiyuan)
-    * [ ] mitm (luzhaoyan)
     * [x] sql_injection (yangyiwen)
     * [ ] credential_stuffing
     * [x] dos (luzhaoyan)
     * [x] xss (luzhaoyan)
-* [ ] Defense
+* [x] Defense
     * [x] reCAPTCHA (wangzirui)
     * [x] Two-factor (liuqiyuan)
     * [x] DoS (luzhaoyan)
     * [x] JWT (luzhaoyan)
     * [x] xss (luzhaoyan)
-* [ ] Website
-    * [ ] backend
+* [x] Website
+    * [x] backend
         * [x] unsafe and safe modes (luzhaoyan)
         * [X] ticket (wangzirui)
         * [X] cart (wangzirui)
         * [x] reviews (luzhaoyan)
-    * [ ] frontend
+    * [x] frontend
         * [X] ticket (wangzirui)
         * [X] cart (wangzirui)
         * [x] reviews (luzhaoyan)
@@ -133,18 +132,19 @@ By default::
 ## Features
 
 ### Attacks
+
 | Attack Type               | Description                                                                                       |
 |---------------------------|---------------------------------------------------------------------------------------------------|
 | **Phishing**              | Examine vulnerabilities that could be exploited by phishing attacks to educate and build awareness. |
 | **Brute-force**           | Simulate brute-force attacks to test the strength of password policies and authentication methods. |
 | **CSRF (Cross-Site Request Forgery)** | Demonstrate how CSRF attacks can manipulate users into performing actions without their knowledge.  |
-| **Man-in-the-Middle (MitM)** | Analyze the security of communication channels to prevent data interception.                     |
 | **SQL Injection**         | Assess the robustness of database systems against unauthorized data manipulation or access.       |
 | **Credential Stuffing**   | Highlight the risks of reused credentials and the importance of unique password policies.         |
 | **DoS (Denial of Service)** | Showcase methods attackers use to disrupt service availability.                                  |
 | **XSS (Cross-Site Scripting)** | Explore how malicious scripts can be injected into web pages and compromise user interactions.   |
 
 ### Defense
+
 | Defense Type              | Description                                                                                       |
 |---------------------------|---------------------------------------------------------------------------------------------------|
 | **reCAPTCHA**             | Enhances security by ensuring interactions are human-driven, preventing automated software attacks. |
@@ -153,4 +153,4 @@ By default::
 | **JWT (JSON Web Tokens)** | Ensures secure user session management through robust token-based authentication.                  |
 | **XSS Protection**        | Provides safeguards against Cross-Site Scripting to maintain the integrity and security of user data. |
 | **Parameterized Queries**             | Protects against SQL injection attacks by separating SQL code from data inputs, ensuring that user inputs cannot alter the structure of SQL queries. |
-``
+
