@@ -22,7 +22,7 @@ const mode = ref('login'); // Toggle between 'login' and 'register'
 const loadRecaptcha = () => {
   nextTick(() => { // Ensure this is called after DOM updates
     const element = document.getElementById('recaptcha-element');
-    if (element && window.grecaptcha) {
+    try{
       if (recaptchaId.value === null) {
         recaptchaId.value = grecaptcha.render(element, {
           'sitekey': '6Lczk7kpAAAAANd46AiA8tL82izCtQy2MvUA5Oug',
@@ -35,8 +35,8 @@ const loadRecaptcha = () => {
           'callback': (token) => { recaptchaToken.value = token; }
         });
       }
-    } else {
-      console.error('reCAPTCHA library not loaded or element not found.');
+    } catch(error) {
+      console.log('reCAPTCHA library not loaded at the moment')
     }
   });
 }
@@ -120,7 +120,7 @@ const registerUser = async () => {
       alert('Registration successful. Please check your email :3');
       router.push('/login');
     } else {
-      alert(data.message);
+      alert('Please fill in all the blanks');
     }
   } catch (error) {
     console.error('Registration failed:', error);
@@ -147,13 +147,20 @@ onUnmounted(() => {
 </script>
 
 <template>
+  <div class = "form-container">
+    <div class="top-padding"></div>
   <div v-if="mode === 'login'">
     <h1>Login</h1>
     <div class="input-container">
-      <div><input v-model="username" type="text" placeholder="Username"></div>
-      <div><input v-model="password" type="password" placeholder="Password"></div>
+      <div class="input-box">
+        <input v-model="username" type="text" placeholder="Username">
+      </div>
+      <div class="input-box">
+        <input v-model="password" type="password" placeholder="Password">
+      </div>
+        <div class="input-box" id="recaptcha-element"></div>
     </div>
-    <div id="recaptcha-element"></div>
+    
     <div class="button-container">
       <button @click.prevent="userLogin" class="login-button">Login</button>
       <button @click.prevent="mode = 'register'" class="login-button">Register</button>
@@ -162,14 +169,17 @@ onUnmounted(() => {
   <div v-else>
     <h1>Register</h1>
     <div class="input-container">
-      <div><input v-model="username" type="text" placeholder="Username"></div>
-      <div><input v-model="email" type="email" placeholder="Email"></div>
-      <div><input v-model="password" type="password" placeholder="Password"></div>
-      <div><input v-model="confirmPassword" type="password" placeholder="Confirm Password"></div>
+      <div class="input-box"><input v-model="username" type="text" placeholder="Username"></div>
+      <div class="input-box"><input v-model="email" type="email" placeholder="Email"></div>
+      <div class="input-box"><input v-model="password" type="password" placeholder="Password"></div>
+      <div class="input-box"><input v-model="confirmPassword" type="password" placeholder="Confirm Password"></div>
     </div>
-    <div> <button @click.prevent="registerUser" class="login-button">Register</button> </div>
-    <button @click.prevent="mode = 'login'" class="login-button">Back to Login</button>
+    <div class="button-container">
+      <button @click.prevent="registerUser" class="login-button">Register</button>
+      <button @click.prevent="mode = 'login'" class="login-button">Back</button>
+    </div>
   </div>
+</div>
 
 </template>
 
