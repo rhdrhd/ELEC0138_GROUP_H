@@ -147,19 +147,19 @@ def register():
 @app.route(f"{API_PREFIX}/v1/login", methods=["POST"])
 @limiter.limit("5 per second")
 def login():
+    req = request.get_json()
+    if not req:
+        return (
+            jsonify(
+                {"status": RESPONSE_STATUS[1], "msg": "Bad request: No JSON body found"}
+            ),
+            400,
+        )
+
+    username = req.get("username", "Unknown")
+    password = req.get("password", "")
 
     if IS_SAFE:
-        req = request.get_json()
-        if not req:
-            return (
-                jsonify(
-                    {"status": RESPONSE_STATUS[1], "msg": "Bad request: No JSON body found"}
-                ),
-                400,
-            )
-
-        username = req.get("username", "Unknown")
-        password = req.get("password", "")
         recaptcha_response = req.get("g-recaptcha-response")
 
         # verify reCAPTCHA response
