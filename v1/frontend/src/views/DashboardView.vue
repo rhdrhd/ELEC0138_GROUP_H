@@ -85,7 +85,9 @@ async function deleteUser() {
   }
 }
 
-
+function topup() {
+  router.push('/topup');
+}
 
 async function userDashboard() {
   console.log('User dashboard')
@@ -200,7 +202,7 @@ onMounted(() => {
       <div class="info-card">
         <h2>Balance</h2>
         <p>${{ balance }}</p>
-        <button @click="edit('balance')">Edit</button>
+        <button @click="topup">Top Up</button>
       </div>
     </div>
     <button class="logout-button" @click="userLogout">Sign Out</button>
@@ -216,12 +218,14 @@ onMounted(() => {
   width: 100%;
   font-family: Verdana, Tahoma, Arial, sans-serif;
 }
+
 .cards-container {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-around;
   width: 650px;
 }
+
 .info-card {
   background: #f4f4f4;
   padding: 20px;
@@ -231,6 +235,7 @@ onMounted(() => {
   text-align: center;
   font-family: Verdana, Tahoma, Arial, sans-serif;
 }
+
 button {
   margin-top: 10px;
   padding: 8px 16px;
@@ -242,27 +247,35 @@ button {
   border-radius: 5px;
   font-family: Verdana, Tahoma, Arial, sans-serif;
 }
+
 button:hover {
   background-color: #81D8D0;
 }
+
 button:active {
   background-color: #eaedf1;
   transform: scale(0.95);
 }
-.logout-button, .delete-button {
+
+.logout-button,
+.delete-button {
   padding: 10px 20px;
   margin-top: 20px;
   font-family: Verdana, Tahoma, Arial, sans-serif;
 }
-.logout-button:active, .delete-button:active {
+
+.logout-button:active,
+.delete-button:active {
   background-color: #eaedf1;
   transform: scale(0.95);
 }
+
 .delete-button {
   background-color: #dc3545;
   color: white;
   margin-top: 20px;
 }
+
 .delete-button:hover {
   background-color: #c82333;
 }
