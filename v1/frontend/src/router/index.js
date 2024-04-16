@@ -60,6 +60,18 @@ const router = createRouter({
       name: 'verify-code',
       component: () => import('../views/VerifyCodeView.vue'),
       meta: { requiresAuth: false }
+    },
+    {
+      path: '/payment',
+      name: 'payment',
+      component: () => import('../views/PaymentView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/topup',
+      name: 'topup',
+      component: () => import('../views/TopUpView.vue'),
+      meta: { requiresAuth: true }
     }
   ]
 });
@@ -71,9 +83,15 @@ router.beforeEach((to, from, next) => {
 
   if (to.matched.some(record => record.meta.requiresAuth)) {
     if (!isAuthenticated) {
-      next('/login');
+      next({
+        path: '/login',
+        query: { redirect: to.fullPath }, // Store the full path to redirect after login
+      });
     } else if (appMode === 'safe' && !isVerified) {
-      next('/verify-code');
+      next({
+        path: '/verify-code',
+        query: { redirect: to.fullPath }, // Store the full path to redirect after login
+      });
     } else {
       next();
     }

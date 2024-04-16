@@ -1,24 +1,31 @@
 <script setup>
 import router from '@/router';
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
+import { useStore } from 'vuex';
 const isDebug = ref(false)
 
 const backend_url = import.meta.env.VITE_APP_BACKEND_URL
 const dashboard_api = backend_url + '/api/v1/dashboard'
 const app_mode = import.meta.env.VITE_APP_MODE
+const store = useStore();
 
 const token = ref('')
 const resp = ref(null)
 const username = ref('')
 const email = ref('')
-const balance = ref('10000.00') // dummy value
+const balance = computed(() => store.getters.getBalance);
+
+// Method to set balance
+function setBalance(amount) {
+  store.commit('updateBalance', amount);
+}
 
 async function edit(field) {
   let newValue = prompt(`Enter new ${field}`);
   if (!newValue) {
     return;
   }
-  
+
   try {
     const response = await fetch(`${backend_url}/update_user`, {
       method: 'POST',
@@ -53,7 +60,7 @@ async function deleteUser() {
   if (!confirmDelete) {
     return;
   }
-  
+
   try {
     const response = await fetch(`${backend_url}/delete_user`, {
       method: 'POST',
@@ -79,6 +86,7 @@ async function deleteUser() {
 }
 
 
+
 async function userDashboard() {
   console.log('User dashboard')
   if (app_mode == "safe") {
@@ -98,6 +106,7 @@ async function userDashboard() {
       if (response.ok) {
         console.log("get /api/v1/dashboard response successfully")
         username.value = data.data.user.username
+        setBalance(data.data.user.balance)
         email.value = data.data.user.email
       } else if (response.status === 401) {
         // Login failed, remove the token if it exists
@@ -129,6 +138,8 @@ async function userDashboard() {
       if (response.ok) {
         console.log("get /api/v1/dashboard response successfully")
         username.value = data.data.user.username
+        setBalance(data.data.user.balance)
+        email.value = data.data.user.email
       } else if (response.status === 401) {
         // Login failed, remove the token if it exists
         localStorage.removeItem('userToken');
@@ -187,7 +198,7 @@ onMounted(() => {
     </div>
     <div class="info-card">
       <h2>Balance</h2>
-      <p>{{ balance }}</p>
+      <p>${{ balance }}</p>
       <button @click="edit('balance')">Edit</button>
     </div>
     <button class="logout-button" @click="userLogout">Sign Out</button>
@@ -209,7 +220,7 @@ onMounted(() => {
   padding: 20px;
   margin: 10px 0;
   width: 300px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   text-align: center;
 }
 
@@ -244,6 +255,4 @@ button:hover {
 .delete-button:hover {
   background-color: #c82333;
 }
-
-
 </style>
