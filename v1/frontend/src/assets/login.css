@@ -1,51 +1,82 @@
+.form-container {
+  max-width: 500px;
+  margin: auto;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.top-padding {
+  height: 20px; /* Adjust this height to ensure it pushes down the rest of the content */
+}
 h1 {
-  margin-bottom: 2rem;
-  /* Increase space below the heading */
+  margin-top: 0;
+  margin-bottom: 2.5rem; /* Slightly more space below the heading */
+  font-size: 2.5em; /* Larger text for heading */
   line-height: 1.4;
-  /* Adjust line height to increase space between lines of text */
+  text-align: center;
+  font-family: Verdana,Tahoma, Arial, sans-serif;
 }
 
 li {
-  margin: 1rem 0;
-  /* Add top and bottom margin to list items */
+  margin: 1.5rem 0; /* More vertical space for each list item */
+  font-size: 1.2em; /* Larger text within list items */
   line-height: 1.6;
-  /* Increase line height for more space between lines */
   list-style-type: none;
 }
 
-input {
-  margin: 1rem 0;
-  /* Add some space above and below input fields */
-  padding: 0.5rem;
-  /* Add padding inside input fields for better visual and typing experience */
+.input-container {
+  display: flex;
+  flex-direction: column; /* Stacks child elements vertically */
+  align-items: center; /* Centers child elements horizontally */
+  padding: 0%;
+  border: none;
+  width: 350px; /* Set a fixed width or percentage as preferred */
+  margin: auto; /* Centers the container in the parent */
+}
+
+.input-box {
+  width: 100%; /* Ensures the input box fills the container */
+  margin-bottom: 30px; /* Adds space between the input boxes */
+  
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+  width: 100%; /* Makes the input fill its container */
+  padding: 20px;
+  font-size: 1.1em;
+  margin: 0; /* Resets any default margin */
   border: 1px solid #ccc;
-  /* Optional: adds a border to make inputs more defined */
   border-radius: 4px;
-  /* Optional: rounds the corners of the input fields */
+}
+
+#recaptcha-element {
+  display: flex;
+  justify-content: center; /* This will center the reCAPTCHA widget */
+  align-items: center; /* This is useful if you need vertical centering */
+  transform:scale(1.15);
+  /*transform-origin:0 0;*/
+  /* No need to set width: 100%; unless you want to match the input boxes exactly */
 }
 
 .login-button {
-  margin-top: 1rem;
-  /* Adds space above the button */
-  /* Include previous button styles here */
-}
-
-/* Previous button styles for a better look */
-.login-button {
+  margin-top: 1.5rem; /* More space above the button */
+  padding: 12px 28px; /* Larger padding for a bigger button */
+  font-size: 20px; /* Larger font size for button text */
+  margin-bottom: 1.5rem; /* More space below the button */
   background-color: #81D8D0;
   color: white;
   border: none;
-  padding: 10px 20px;
-  font-size: 16px;
   border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.3s, transform 0.2s;
-  margin-bottom: 14px;
+  font-family: Verdana,Tahoma, Arial, sans-serif;
 }
 
 .login-button:hover {
   background-color: #81D8D0;
-  transform: scale(1.05);
+  transform: scale(1.08); /* Slightly larger scale on hover */
 }
 
 .login-button:active {
@@ -53,8 +84,7 @@ input {
   transform: scale(0.95);
 }
 
-
 .button-container {
   display: flex;
-  justify-content: space-between; /* Distributes space evenly between the buttons */
+  justify-content: space-between;
 }

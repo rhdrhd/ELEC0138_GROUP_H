@@ -20,35 +20,33 @@ const recaptchaId = ref(null);
 const mode = ref('login'); // Toggle between 'login' and 'register'
 
 const loadRecaptcha = () => {
-  if (app_mode === "safe") { // Only load reCAPTCHA in safe mode
-    nextTick(() => {
-      const element = document.getElementById('recaptcha-element');
-      if (element && window.grecaptcha) {
-        if (recaptchaId.value === null) {
-          recaptchaId.value = grecaptcha.render(element, {
-            'sitekey': '6Lczk7kpAAAAANd46AiA8tL82izCtQy2MvUA5Oug',
-            'callback': (token) => { recaptchaToken.value = token; }
-          });
-        } else {
-          grecaptcha.reset(recaptchaId.value);
-          recaptchaId.value = grecaptcha.render(element, {
-            'sitekey': '6Lczk7kpAAAAANd46AiA8tL82izCtQy2MvUA5Oug',
-            'callback': (token) => { recaptchaToken.value = token; }
-          });
-        }
+  nextTick(() => { // Ensure this is called after DOM updates
+    const element = document.getElementById('recaptcha-element');
+    try{
+      if (recaptchaId.value === null) {
+        recaptchaId.value = grecaptcha.render(element, {
+          'sitekey': '6Lczk7kpAAAAANd46AiA8tL82izCtQy2MvUA5Oug',
+          'callback': (token) => { recaptchaToken.value = token; }
+        });
       } else {
-        console.error('reCAPTCHA library not loaded or element not found.');
+        grecaptcha.reset(recaptchaId.value); // Reset before rendering again
+        recaptchaId.value = grecaptcha.render(element, {
+          'sitekey': '6Lczk7kpAAAAANd46AiA8tL82izCtQy2MvUA5Oug',
+          'callback': (token) => { recaptchaToken.value = token; }
+        });
       }
-    });
-  }
+    } catch(error) {
+      console.log('reCAPTCHA library not loaded at the moment')
+    }
+  });
 }
 
 watch(mode, () => {
-  if (app_mode === "safe" && recaptchaId.value !== null) {
+  if (recaptchaId.value !== null) {
     grecaptcha.reset(recaptchaId.value); // Ensure it's cleared when mode changes
     recaptchaId.value = null;
-    loadRecaptcha();
   }
+  loadRecaptcha();
 }, { immediate: true });
 
 const sendLoginCode = async (username) => {
@@ -75,7 +73,8 @@ const userLogin = async () => {
       alert("Please complete the reCAPTCHA to login.");
       return;
     }
-    try {
+  }
+  try {
     const response = await fetch(login_api, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -101,39 +100,6 @@ const userLogin = async () => {
     console.error('Login failed:', error);
     alert('Login request failed. Please try again later.');
   }
-
-  }
-  else{
-    // unsafe mode
-    try {
-    const response = await fetch(login_api, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({
-        username: username.value,
-        password: password.value,
-        'g-recaptcha-response': recaptchaToken.value
-      }),
-    });
-    const data = await response.json();
-    if (response.ok) {
-      token.value = data.data.token;
-      localStorage.setItem('userToken', token.value);
-      localStorage.setItem('usernameForVerification', username.value);
-      localStorage.setItem('emailForVerification', data.data.email);
-      await sendLoginCode(username.value);
-      router.push('/dashboard');
-    } else {
-      alert(data.msg);
-    }
-  } catch (error) {
-    console.error('Login failed:', error);
-    alert('Login request failed. Please try again later.');
-  }
-
-  }
-
 }
 
 const registerUser = async () => {
@@ -154,7 +120,7 @@ const registerUser = async () => {
       alert('Registration successful. Please check your email :3');
       router.push('/login');
     } else {
-      alert(data.message);
+      alert('Please fill in all the blanks');
     }
   } catch (error) {
     console.error('Registration failed:', error);
@@ -181,13 +147,20 @@ onUnmounted(() => {
 </script>
 
 <template>
+  <div class = "form-container">
+    <div class="top-padding"></div>
   <div v-if="mode === 'login'">
     <h1>Login</h1>
     <div class="input-container">
-      <div><input v-model="username" type="text" placeholder="Username"></div>
-      <div><input v-model="password" type="password" placeholder="Password"></div>
+      <div class="input-box">
+        <input v-model="username" type="text" placeholder="Username">
+      </div>
+      <div class="input-box">
+        <input v-model="password" type="password" placeholder="Password">
+      </div>
+        <div class="input-box" id="recaptcha-element"></div>
     </div>
-    <div id="recaptcha-element"></div>
+    
     <div class="button-container">
       <button @click.prevent="userLogin" class="login-button">Login</button>
       <button @click.prevent="mode = 'register'" class="login-button">Register</button>
@@ -196,14 +169,17 @@ onUnmounted(() => {
   <div v-else>
     <h1>Register</h1>
     <div class="input-container">
-      <div><input v-model="username" type="text" placeholder="Username"></div>
-      <div><input v-model="email" type="email" placeholder="Email"></div>
-      <div><input v-model="password" type="password" placeholder="Password"></div>
-      <div><input v-model="confirmPassword" type="password" placeholder="Confirm Password"></div>
+      <div class="input-box"><input v-model="username" type="text" placeholder="Username"></div>
+      <div class="input-box"><input v-model="email" type="email" placeholder="Email"></div>
+      <div class="input-box"><input v-model="password" type="password" placeholder="Password"></div>
+      <div class="input-box"><input v-model="confirmPassword" type="password" placeholder="Confirm Password"></div>
     </div>
-    <div> <button @click.prevent="registerUser" class="login-button">Register</button> </div>
-    <button @click.prevent="mode = 'login'" class="login-button">Back to Login</button>
+    <div class="button-container">
+      <button @click.prevent="registerUser" class="login-button">Register</button>
+      <button @click.prevent="mode = 'login'" class="login-button">Back</button>
+    </div>
   </div>
+</div>
 
 </template>
 
