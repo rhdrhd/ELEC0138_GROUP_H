@@ -30,7 +30,10 @@ $ npm run dev
 
 ## Mitigation
 
-DOM-based XSS: This type of XSS attack occurs when data from an untrusted source is used to manipulate the Document Object Model (DOM) in an unsafe way. Vue.js might not automatically sanitize JavaScript code that manipulates the DOM directly, especially if you use v-html to insert raw HTML dynamically. Always ensure that any dynamic HTML is properly sanitized before insertion.
+### Stored XSS
+
+Stored XSS occurs when a web application stores user input that is later embedded in output delivered to other users. The malicious script is stored on the server (e.g., in a database, message forum, visitor log, comment field).
+When other users access the stored information, the malicious script executes within their browsers. This makes stored XSS particularly dangerous, as it can affect multiple users and persists over time until the malicious data is removed.
 
 Therefore, we must replace
 
