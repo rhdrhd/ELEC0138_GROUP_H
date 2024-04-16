@@ -7,6 +7,7 @@ const backend_url = import.meta.env.VITE_APP_BACKEND_URL;
 const login_api = `${backend_url}/api/v1/login`;
 const register_api = `${backend_url}/api/v1/register`;
 const app_mode = import.meta.env.VITE_APP_MODE;
+const sitekey = import.meta.env.VITE_RECAPTCHA_SITEKEY;
 
 const username = ref('');
 const email = ref('');
@@ -23,18 +24,10 @@ const loadRecaptcha = () => {
   nextTick(() => { // Ensure this is called after DOM updates
     const element = document.getElementById('recaptcha-element');
     try{
-      if (recaptchaId.value === null) {
         recaptchaId.value = grecaptcha.render(element, {
-          'sitekey': '6Lczk7kpAAAAANd46AiA8tL82izCtQy2MvUA5Oug',
+          'sitekey': sitekey,
           'callback': (token) => { recaptchaToken.value = token; }
         });
-      } else {
-        grecaptcha.reset(recaptchaId.value); // Reset before rendering again
-        recaptchaId.value = grecaptcha.render(element, {
-          'sitekey': '6Lczk7kpAAAAANd46AiA8tL82izCtQy2MvUA5Oug',
-          'callback': (token) => { recaptchaToken.value = token; }
-        });
-      }
     } catch(error) {
       console.log('reCAPTCHA library not loaded at the moment')
     }

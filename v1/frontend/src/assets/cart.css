@@ -27,21 +27,27 @@
 }
 
 .cart-top-up {
-  padding: 10px;
+  padding: 20px;
+  width: 20%;
   background-color: #81D8D0;
   color: white;
   border: none;
   cursor: pointer;
   border-radius: 4px;
+  font-size: 1.2em;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .cart-checkout {
-  padding: 10px;
+  padding: 20px;
+  width: 20%;
   background-color: #81D8D0;
   color: white;
   border: none;
   cursor: pointer;
   border-radius: 4px;
+  font-size: 1.2em;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .item-info h2 {
@@ -51,15 +57,21 @@
 
 .item-info p {
   margin: 5px 0;
+  text-align: justify;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .item-actions button {
-  padding: 10px;
+  padding: 15px;
+  width: 80%;
   background-color: #f64539;
   color: white;
   border: none;
   cursor: pointer;
   border-radius: 4px;
+  margin-left: 30px;
+  font-size: 1.2em;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .item-actions button:hover {
