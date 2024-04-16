@@ -181,31 +181,32 @@ onMounted(() => {
 <template>
   <div class="dashboard-container">
     <h1>Dashboard</h1>
-    <div class="info-card">
-      <h2>Username</h2>
-      <p>{{ username }}</p>
-      <button @click="edit('username')">Edit</button>
-    </div>
-    <div class="info-card">
-      <h2>Email</h2>
-      <p>{{ email }}</p>
-      <button @click="edit('email')">Edit</button>
-    </div>
-    <div class="info-card">
-      <h2>Password</h2>
-      <p>••••••••</p>
-      <button @click="edit('password')">Edit</button>
-    </div>
-    <div class="info-card">
-      <h2>Balance</h2>
-      <p>${{ balance }}</p>
-      <button @click="edit('balance')">Edit</button>
+    <div class="cards-container">
+      <div class="info-card">
+        <h2>Username</h2>
+        <p>{{ username }}</p>
+        <button @click="edit('username')">Edit</button>
+      </div>
+      <div class="info-card">
+        <h2>Email</h2>
+        <p>{{ email }}</p>
+        <button @click="edit('email')">Edit</button>
+      </div>
+      <div class="info-card">
+        <h2>Password</h2>
+        <p>••••••••</p>
+        <button @click="edit('password')">Edit</button>
+      </div>
+      <div class="info-card">
+        <h2>Balance</h2>
+        <p>${{ balance }}</p>
+        <button @click="edit('balance')">Edit</button>
+      </div>
     </div>
     <button class="logout-button" @click="userLogout">Sign Out</button>
     <button class="delete-button" @click="deleteUser">Delete Account</button>
   </div>
 </template>
-
 
 <style scoped>
 .dashboard-container {
@@ -213,45 +214,55 @@ onMounted(() => {
   flex-direction: column;
   align-items: center;
   width: 100%;
+  font-family: Verdana, Tahoma, Arial, sans-serif;
 }
-
+.cards-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  width: 650px;
+}
 .info-card {
   background: #f4f4f4;
   padding: 20px;
-  margin: 10px 0;
+  margin: 10px;
   width: 300px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   text-align: center;
+  font-family: Verdana, Tahoma, Arial, sans-serif;
 }
-
 button {
   margin-top: 10px;
   padding: 8px 16px;
   font-size: 16px;
   cursor: pointer;
-  background-color: #007BFF;
+  background-color: #81D8D0;
   color: white;
   border: none;
   border-radius: 5px;
+  font-family: Verdana, Tahoma, Arial, sans-serif;
 }
-
 button:hover {
-  background-color: #0056b3;
+  background-color: #81D8D0;
 }
-
-.logout-button {
+button:active {
+  background-color: #eaedf1;
+  transform: scale(0.95);
+}
+.logout-button, .delete-button {
   padding: 10px 20px;
-  background-color: red;
   margin-top: 20px;
+  font-family: Verdana, Tahoma, Arial, sans-serif;
 }
-
+.logout-button:active, .delete-button:active {
+  background-color: #eaedf1;
+  transform: scale(0.95);
+}
 .delete-button {
-  padding: 10px 20px;
   background-color: #dc3545;
   color: white;
-  margin-top: 10px;
+  margin-top: 20px;
 }
-
 .delete-button:hover {
   background-color: #c82333;
 }
