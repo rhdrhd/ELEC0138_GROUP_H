@@ -1,10 +1,10 @@
 import requests
 
 ip = "127.0.0.1"
-port = 15000
+port = 5000
 pack = 1000
-num_threads = 1000
-num_requests = 10000
+num_threads = 100
+num_requests = 1000
 api_suffix = "/api/v1/venues"
 
 
