@@ -21,17 +21,19 @@ const recaptchaId = ref(null);
 const mode = ref('login'); // Toggle between 'login' and 'register'
 
 const loadRecaptcha = () => {
-  nextTick(() => { // Ensure this is called after DOM updates
-    const element = document.getElementById('recaptcha-element');
-    try{
-        recaptchaId.value = grecaptcha.render(element, {
-          'sitekey': sitekey,
-          'callback': (token) => { recaptchaToken.value = token; }
-        });
-    } catch(error) {
-      console.log('reCAPTCHA library not loaded at the moment')
-    }
-  });
+  if (app_mode === "safe") { // Only load reCAPTCHA in safe mode
+    nextTick(() => { // Ensure this is called after DOM updates
+      const element = document.getElementById('recaptcha-element');
+      try{
+          recaptchaId.value = grecaptcha.render(element, {
+            'sitekey': sitekey,
+            'callback': (token) => { recaptchaToken.value = token; }
+          });
+      } catch(error) {
+        console.log('reCAPTCHA library not loaded at the moment')
+      }
+    });
+  }
 }
 
 watch(mode, () => {
