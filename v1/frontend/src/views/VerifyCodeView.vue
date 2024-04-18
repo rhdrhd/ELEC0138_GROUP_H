@@ -54,7 +54,7 @@ export default {
         errorMessage.value = 'Verification failed. Please try again later.';
       }
     };
-    
+
     const handleReturn = () => {
       localStorage.removeItem('userToken');
       localStorage.removeItem('usernameForVerification');
@@ -91,14 +91,18 @@ button {
   padding: 10px;
   width: 300px;
   font-size: 16px;
-  border: 1px solid #ccc; /* Add border to match the original button style */
-  background-color: #fff; /* Background color */
-  color: #333; /* Text color */
+  border: 1px solid #ccc;
+  /* Add border to match the original button style */
+  background-color: #fff;
+  /* Background color */
+  color: #333;
+  /* Text color */
   cursor: pointer;
 }
 
 button:hover {
-  background-color: #f3f4f6; /* Slightly different background on hover */
+  background-color: #f3f4f6;
+  /* Slightly different background on hover */
 }
 
 .email-hint {
@@ -112,4 +116,3 @@ button:hover {
   margin-top: 20px;
 }
 </style>
-
