@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from constants import APP_SECRET_KEY, RESPONSE_STATUS
-
 import jwt
+from constants import APP_SECRET_KEY, RESPONSE_STATUS
 
 
 def gen_jwt_token(payload: dict) -> str:

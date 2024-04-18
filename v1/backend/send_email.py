@@ -1,17 +1,15 @@
+import configparser
+import os
 import smtplib
 import sqlite3
-import os
-import configparser
 
 config = configparser.ConfigParser()
 config.read("../../config.ini")
 
-from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-from constants import (
-    USER_DATABASE_FILENAME,
-    USER_UNSAFE_DATABASE_FILENAME,
-)
+from email.mime.text import MIMEText
+
+from constants import USER_DATABASE_FILENAME, USER_UNSAFE_DATABASE_FILENAME
 
 CWD = os.getcwd()
 USER_DATABASE_FILEPATH = os.path.join(CWD, USER_DATABASE_FILENAME)

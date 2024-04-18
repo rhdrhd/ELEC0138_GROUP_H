@@ -1,12 +1,12 @@
+import configparser
 import csv
 import smtplib
-import configparser
 
 config = configparser.ConfigParser()
 config.read("../../config.ini")
 
-from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
 victims_file = "victim_list.csv"
 phishing_link = "http://localhost:4001/"

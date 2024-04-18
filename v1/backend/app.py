@@ -5,32 +5,31 @@ import datetime
 import os
 import random
 
-from auth import gen_jwt_token, validate_header, validate_and_decode_jwt
+import requests
+from auth import gen_jwt_token, validate_and_decode_jwt, validate_header
 from constants import (
-    APP_SECRET_KEY,
+    ALLOWED_ORIGIN,
     API_PREFIX,
+    APP_SECRET_KEY,
+    DEFAULT_TOKEN_EXPIRATION_MINUTES,
+    RECAPTCHA_SECRET_KEY,
+    RESPONSE_STATUS,
     USER_DATABASE_FILENAME,
     USER_UNSAFE_DATABASE_FILENAME,
     VENUE_DATABASE_FILENAME,
-    DEFAULT_TOKEN_EXPIRATION_MINUTES,
-    RESPONSE_STATUS,
-    ALLOWED_ORIGIN,
-    RECAPTCHA_SECRET_KEY,
 )
 from database import (
+    get_balance,
+    get_sqlite_conn,
     get_sqlite_cursor,
     insert_new_review,
-    get_sqlite_conn,
-    get_balance,
     update_balance,
 )
-from limiter import get_limiter
-from send_email import send_email, clear_login_codes
-from werkzeug.security import check_password_hash, generate_password_hash
-from flask import Flask, request, jsonify, make_response
+from flask import Flask, jsonify, make_response, request
 from flask_cors import CORS
-
-import requests
+from limiter import get_limiter
+from send_email import clear_login_codes, send_email
+from werkzeug.security import check_password_hash, generate_password_hash
 
 CWD = os.getcwd()
 USER_DATABASE_FILEPATH = os.path.join(CWD, USER_DATABASE_FILENAME)

@@ -1,8 +1,9 @@
-from model.feature import FeatureExtraction
-import numpy as np
-import pandas as pd
 import pickle
 import warnings
+
+import numpy as np
+import pandas as pd
+from model.feature import FeatureExtraction
 
 warnings.filterwarnings("ignore")
 

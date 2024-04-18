@@ -1,23 +1,22 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import csv
 import datetime
 import os
-import requests
-import csv
 
-from auth import gen_jwt_token, validate_header, validate_and_decode_jwt
+import requests
+from auth import gen_jwt_token, validate_and_decode_jwt, validate_header
 from constants import (
-    APP_SECRET_KEY,
     API_PREFIX,
-    USER_DATABASE_FILENAME,
-    VENUE_DATABASE_FILENAME,
+    APP_SECRET_KEY,
     DEFAULT_TOKEN_EXPIRATION_MINUTES,
     RESPONSE_STATUS,
+    USER_DATABASE_FILENAME,
+    VENUE_DATABASE_FILENAME,
 )
 from database import get_sqlite_cursor
-
-from flask import Flask, request, jsonify, Response
+from flask import Flask, Response, jsonify, request
 from flask_cors import CORS
 from werkzeug.security import check_password_hash
 
@@ -28,6 +27,7 @@ VENUE_DATABASE_FILEPATH = os.path.join(CWD, VENUE_DATABASE_FILENAME)
 app = Flask(__name__)
 app.secret_key = APP_SECRET_KEY
 CORS(app)
+
 
 # TODO: venues
 @app.route(f"{API_PREFIX}/v1/venues", methods=["GET"])
