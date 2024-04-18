@@ -21,17 +21,19 @@ const recaptchaId = ref(null);
 const mode = ref('login'); // Toggle between 'login' and 'register'
 
 const loadRecaptcha = () => {
-  nextTick(() => { // Ensure this is called after DOM updates
-    const element = document.getElementById('recaptcha-element');
-    try{
-        recaptchaId.value = grecaptcha.render(element, {
-          'sitekey': sitekey,
-          'callback': (token) => { recaptchaToken.value = token; }
-        });
-    } catch(error) {
-      console.log('reCAPTCHA library not loaded at the moment')
-    }
-  });
+  if (app_mode === "safe") { // Only load reCAPTCHA in safe mode
+    nextTick(() => { // Ensure this is called after DOM updates
+      const element = document.getElementById('recaptcha-element');
+      try{
+          recaptchaId.value = grecaptcha.render(element, {
+            'sitekey': sitekey,
+            'callback': (token) => { recaptchaToken.value = token; }
+          });
+      } catch(error) {
+        console.log('reCAPTCHA library not loaded at the moment')
+      }
+    });
+  }
 }
 
 watch(mode, () => {
@@ -66,8 +68,7 @@ const userLogin = async () => {
       alert("Please complete the reCAPTCHA to login.");
       return;
     }
-  }
-  try {
+    try {
     const response = await fetch(login_api, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -92,6 +93,37 @@ const userLogin = async () => {
   } catch (error) {
     console.error('Login failed:', error);
     alert('Login request failed. Please try again later.');
+  }
+
+  }
+  else{
+    // unsafe mode
+    try {
+    const response = await fetch(login_api, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({
+        username: username.value,
+        password: password.value,
+        'g-recaptcha-response': recaptchaToken.value
+      }),
+    });
+    const data = await response.json();
+    if (response.ok) {
+      token.value = data.data.token;
+      localStorage.setItem('userToken', token.value);
+      localStorage.setItem('usernameForVerification', username.value);
+      localStorage.setItem('emailForVerification', data.data.email);
+      router.push('/dashboard');
+    } else {
+      alert(data.msg);
+    }
+  } catch (error) {
+    console.error('Login failed:', error);
+    alert('Login request failed. Please try again later.');
+  }
+
   }
 }
 
