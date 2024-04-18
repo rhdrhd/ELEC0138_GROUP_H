@@ -20,26 +20,29 @@ const recaptchaId = ref(null);
 const mode = ref('login'); // Toggle between 'login' and 'register'
 
 const loadRecaptcha = () => {
-  nextTick(() => { // Ensure this is called after DOM updates
-    const element = document.getElementById('recaptcha-element');
-    try{
-      if (recaptchaId.value === null) {
-        recaptchaId.value = grecaptcha.render(element, {
-          'sitekey': '6Lczk7kpAAAAANd46AiA8tL82izCtQy2MvUA5Oug',
-          'callback': (token) => { recaptchaToken.value = token; }
-        });
+  if (app_mode === "safe") { // Only load reCAPTCHA in safe mode
+    nextTick(() => {
+      const element = document.getElementById('recaptcha-element');
+      if (element && window.grecaptcha) {
+        if (recaptchaId.value === null) {
+          recaptchaId.value = grecaptcha.render(element, {
+            'sitekey': '6Lczk7kpAAAAANd46AiA8tL82izCtQy2MvUA5Oug',
+            'callback': (token) => { recaptchaToken.value = token; }
+          });
+        } else {
+          grecaptcha.reset(recaptchaId.value);
+          recaptchaId.value = grecaptcha.render(element, {
+            'sitekey': '6Lczk7kpAAAAANd46AiA8tL82izCtQy2MvUA5Oug',
+            'callback': (token) => { recaptchaToken.value = token; }
+          });
+        }
       } else {
-        grecaptcha.reset(recaptchaId.value); // Reset before rendering again
-        recaptchaId.value = grecaptcha.render(element, {
-          'sitekey': '6Lczk7kpAAAAANd46AiA8tL82izCtQy2MvUA5Oug',
-          'callback': (token) => { recaptchaToken.value = token; }
-        });
+        console.error('reCAPTCHA library not loaded or element not found.');
       }
-    } catch(error) {
-      console.log('reCAPTCHA library not loaded at the moment')
-    }
-  });
+    });
+  }
 }
+
 
 watch(mode, () => {
   if (recaptchaId.value !== null) {
@@ -73,8 +76,7 @@ const userLogin = async () => {
       alert("Please complete the reCAPTCHA to login.");
       return;
     }
-  }
-  try {
+    try {
     const response = await fetch(login_api, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -99,6 +101,37 @@ const userLogin = async () => {
   } catch (error) {
     console.error('Login failed:', error);
     alert('Login request failed. Please try again later.');
+  }
+
+  }
+  else{
+    // unsafe mode
+    try {
+    const response = await fetch(login_api, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({
+        username: username.value,
+        password: password.value,
+        'g-recaptcha-response': recaptchaToken.value
+      }),
+    });
+    const data = await response.json();
+    if (response.ok) {
+      token.value = data.data.token;
+      localStorage.setItem('userToken', token.value);
+      localStorage.setItem('usernameForVerification', username.value);
+      localStorage.setItem('emailForVerification', data.data.email);
+      router.push('/dashboard');
+    } else {
+      alert(data.msg);
+    }
+  } catch (error) {
+    console.error('Login failed:', error);
+    alert('Login request failed. Please try again later.');
+  }
+
   }
 }
 

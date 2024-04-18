@@ -211,7 +211,7 @@ def register():
 
 
 @app.route(f"{API_PREFIX}/v1/login", methods=["POST"])
-@limiter.limit("5 per second")
+@limiter.limit("1 per second")
 def login():
     req = request.get_json()
     if not req:
@@ -306,7 +306,7 @@ def login():
             exp = datetime.datetime.utcnow() + datetime.timedelta(
                 minutes=DEFAULT_TOKEN_EXPIRATION_MINUTES
             )
-            payload = {"username": username, "password": user["password"], "exp": exp}
+            payload = {"username": user["username"], "password": user["password"], "exp": exp}
             token = gen_jwt_token(payload)
 
             response = make_response(
