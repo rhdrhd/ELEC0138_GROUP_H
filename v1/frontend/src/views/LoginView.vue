@@ -24,12 +24,12 @@ const loadRecaptcha = () => {
   if (app_mode === "safe") { // Only load reCAPTCHA in safe mode
     nextTick(() => { // Ensure this is called after DOM updates
       const element = document.getElementById('recaptcha-element');
-      try{
-          recaptchaId.value = grecaptcha.render(element, {
-            'sitekey': sitekey,
-            'callback': (token) => { recaptchaToken.value = token; }
-          });
-      } catch(error) {
+      try {
+        recaptchaId.value = grecaptcha.render(element, {
+          'sitekey': sitekey,
+          'callback': (token) => { recaptchaToken.value = token; }
+        });
+      } catch (error) {
         console.log('reCAPTCHA library not loaded at the moment')
       }
     });
@@ -69,60 +69,60 @@ const userLogin = async () => {
       return;
     }
     try {
-    const response = await fetch(login_api, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({
-        username: username.value,
-        password: password.value,
-        'g-recaptcha-response': recaptchaToken.value
-      }),
-    });
-    const data = await response.json();
-    if (response.ok) {
-      token.value = data.data.token;
-      localStorage.setItem('userToken', token.value);
-      localStorage.setItem('usernameForVerification', username.value);  // Store username for sending the login code
-      localStorage.setItem('emailForVerification', data.data.email);  // Store email for verification
-      await sendLoginCode(username.value);  // Now correctly passing username
-      router.push('/verify-code');
-    } else {
-      alert(data.msg);
+      const response = await fetch(login_api, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          username: username.value,
+          password: password.value,
+          'g-recaptcha-response': recaptchaToken.value
+        }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        token.value = data.data.token;
+        localStorage.setItem('userToken', token.value);
+        localStorage.setItem('usernameForVerification', username.value);  // Store username for sending the login code
+        localStorage.setItem('emailForVerification', data.data.email);  // Store email for verification
+        await sendLoginCode(username.value);  // Now correctly passing username
+        router.push('/verify-code');
+      } else {
+        alert(data.msg);
+      }
+    } catch (error) {
+      console.error('Login failed:', error);
+      alert('Login request failed. Please try again later.');
     }
-  } catch (error) {
-    console.error('Login failed:', error);
-    alert('Login request failed. Please try again later.');
-  }
 
   }
-  else{
+  else {
     // unsafe mode
     try {
-    const response = await fetch(login_api, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({
-        username: username.value,
-        password: password.value,
-        'g-recaptcha-response': recaptchaToken.value
-      }),
-    });
-    const data = await response.json();
-    if (response.ok) {
-      token.value = data.data.token;
-      localStorage.setItem('userToken', token.value);
-      localStorage.setItem('usernameForVerification', username.value);
-      localStorage.setItem('emailForVerification', data.data.email);
-      router.push('/dashboard');
-    } else {
-      alert(data.msg);
+      const response = await fetch(login_api, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          username: username.value,
+          password: password.value,
+          'g-recaptcha-response': recaptchaToken.value
+        }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        token.value = data.data.token;
+        localStorage.setItem('userToken', token.value);
+        localStorage.setItem('usernameForVerification', username.value);
+        localStorage.setItem('emailForVerification', data.data.email);
+        router.push('/dashboard');
+      } else {
+        alert(data.msg);
+      }
+    } catch (error) {
+      console.error('Login failed:', error);
+      alert('Login request failed. Please try again later.');
     }
-  } catch (error) {
-    console.error('Login failed:', error);
-    alert('Login request failed. Please try again later.');
-  }
 
   }
 }
@@ -172,39 +172,39 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class = "form-container">
+  <div class="form-container">
     <div class="top-padding"></div>
-  <div v-if="mode === 'login'">
-    <h1>Login</h1>
-    <div class="input-container">
-      <div class="input-box">
-        <input v-model="username" type="text" placeholder="Username">
-      </div>
-      <div class="input-box">
-        <input v-model="password" type="password" placeholder="Password">
-      </div>
+    <div v-if="mode === 'login'">
+      <h1>Login</h1>
+      <div class="input-container">
+        <div class="input-box">
+          <input v-model="username" type="text" placeholder="Username">
+        </div>
+        <div class="input-box">
+          <input v-model="password" type="password" placeholder="Password">
+        </div>
         <div class="input-box" id="recaptcha-element"></div>
+      </div>
+
+      <div class="button-container">
+        <button @click.prevent="userLogin" class="login-button">Login</button>
+        <button @click.prevent="mode = 'register'" class="login-button">Register</button>
+      </div>
     </div>
-    
-    <div class="button-container">
-      <button @click.prevent="userLogin" class="login-button">Login</button>
-      <button @click.prevent="mode = 'register'" class="login-button">Register</button>
+    <div v-else>
+      <h1>Register</h1>
+      <div class="input-container">
+        <div class="input-box"><input v-model="username" type="text" placeholder="Username"></div>
+        <div class="input-box"><input v-model="email" type="email" placeholder="Email"></div>
+        <div class="input-box"><input v-model="password" type="password" placeholder="Password"></div>
+        <div class="input-box"><input v-model="confirmPassword" type="password" placeholder="Confirm Password"></div>
+      </div>
+      <div class="button-container">
+        <button @click.prevent="registerUser" class="login-button">Register</button>
+        <button @click.prevent="mode = 'login'" class="login-button">Back</button>
+      </div>
     </div>
   </div>
-  <div v-else>
-    <h1>Register</h1>
-    <div class="input-container">
-      <div class="input-box"><input v-model="username" type="text" placeholder="Username"></div>
-      <div class="input-box"><input v-model="email" type="email" placeholder="Email"></div>
-      <div class="input-box"><input v-model="password" type="password" placeholder="Password"></div>
-      <div class="input-box"><input v-model="confirmPassword" type="password" placeholder="Confirm Password"></div>
-    </div>
-    <div class="button-container">
-      <button @click.prevent="registerUser" class="login-button">Register</button>
-      <button @click.prevent="mode = 'login'" class="login-button">Back</button>
-    </div>
-  </div>
-</div>
 
 </template>
 
