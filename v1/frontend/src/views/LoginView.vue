@@ -7,6 +7,7 @@ const backend_url = import.meta.env.VITE_APP_BACKEND_URL;
 const login_api = `${backend_url}/api/v1/login`;
 const register_api = `${backend_url}/api/v1/register`;
 const app_mode = import.meta.env.VITE_APP_MODE;
+const sitekey = import.meta.env.VITE_RECAPTCHA_SITEKEY;
 
 const username = ref('');
 const email = ref('');
@@ -20,29 +21,18 @@ const recaptchaId = ref(null);
 const mode = ref('login'); // Toggle between 'login' and 'register'
 
 const loadRecaptcha = () => {
-  if (app_mode === "safe") { // Only load reCAPTCHA in safe mode
-    nextTick(() => {
-      const element = document.getElementById('recaptcha-element');
-      if (element && window.grecaptcha) {
-        if (recaptchaId.value === null) {
-          recaptchaId.value = grecaptcha.render(element, {
-            'sitekey': '6Lczk7kpAAAAANd46AiA8tL82izCtQy2MvUA5Oug',
-            'callback': (token) => { recaptchaToken.value = token; }
-          });
-        } else {
-          grecaptcha.reset(recaptchaId.value);
-          recaptchaId.value = grecaptcha.render(element, {
-            'sitekey': '6Lczk7kpAAAAANd46AiA8tL82izCtQy2MvUA5Oug',
-            'callback': (token) => { recaptchaToken.value = token; }
-          });
-        }
-      } else {
-        console.error('reCAPTCHA library not loaded or element not found.');
-      }
-    });
-  }
+  nextTick(() => { // Ensure this is called after DOM updates
+    const element = document.getElementById('recaptcha-element');
+    try{
+        recaptchaId.value = grecaptcha.render(element, {
+          'sitekey': sitekey,
+          'callback': (token) => { recaptchaToken.value = token; }
+        });
+    } catch(error) {
+      console.log('reCAPTCHA library not loaded at the moment')
+    }
+  });
 }
-
 
 watch(mode, () => {
   if (recaptchaId.value !== null) {

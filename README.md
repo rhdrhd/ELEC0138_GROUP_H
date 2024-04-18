@@ -1,5 +1,7 @@
 # ELEC0138_GROUP_H
 
+In this project, a ticket sales website is created. The website is designed to sell tickets for various events. The website has two versions: a safe version and an unsafe version. The safe version is designed to be secure and protect the user's data, while the unsafe version is designed to have vulnerabilities that can be exploited by attackers. The website has various features, including ticket sales, shopping cart, and user reviews. The website is built using Flask for the backend and Vue.js for the frontend. The website uses SQLite as the database.
+
 ## Contents
 
 - [ELEC0138\_GROUP\_H](#elec0138_group_h)
@@ -11,6 +13,9 @@
     - [Database](#database)
     - [Debugging](#debugging)
     - [TODOs](#todos)
+  - [Features](#features)
+    - [Attacks](#attacks)
+    - [Defense](#defense)
 
 ## Prerequisites
 
@@ -88,7 +93,7 @@ And then you can visit our ticket selling website through `http://localhost:5173
 
 We are using sqlite as our database.
 
-By default:
+By default::
 
 * `username: elec0138`
 * `password: 8964`
@@ -99,28 +104,53 @@ By default:
 
 ### TODOs
 
-* [ ] Attacks
-    * [ ] Phishing (liuqiyuan) (90%)
+* [x] Attacks
+    * [x] Phishing (liuqiyuan)
     * [x] Brute-force (liuqiyuan)
     * [x] CSRF (liuqiyuan)
-    * [ ] mitm (luzhaoyan)
     * [x] sql_injection (yangyiwen)
     * [ ] credential_stuffing
     * [x] dos (luzhaoyan)
     * [x] xss (luzhaoyan)
-* [ ] Defense
+* [x] Defense
     * [x] reCAPTCHA (wangzirui)
     * [x] Two-factor (liuqiyuan)
     * [x] DoS (luzhaoyan)
     * [x] JWT (luzhaoyan)
     * [x] xss (luzhaoyan)
-* [ ] Website
-    * [ ] backend
+* [x] Website
+    * [x] backend
         * [x] unsafe and safe modes (luzhaoyan)
         * [X] ticket (wangzirui)
         * [X] cart (wangzirui)
         * [x] reviews (luzhaoyan)
-    * [ ] frontend
+    * [x] frontend
         * [X] ticket (wangzirui)
         * [X] cart (wangzirui)
         * [x] reviews (luzhaoyan)
+
+## Features
+
+### Attacks
+
+| Attack Type               | Description                                                                                       |
+|---------------------------|---------------------------------------------------------------------------------------------------|
+| **Phishing**              | Examine vulnerabilities that could be exploited by phishing attacks to educate and build awareness. |
+| **Brute-force**           | Simulate brute-force attacks to test the strength of password policies and authentication methods. |
+| **CSRF (Cross-Site Request Forgery)** | Demonstrate how CSRF attacks can manipulate users into performing actions without their knowledge.  |
+| **SQL Injection**         | Assess the robustness of database systems against unauthorized data manipulation or access.       |
+| **Credential Stuffing**   | Highlight the risks of reused credentials and the importance of unique password policies.         |
+| **DoS (Denial of Service)** | Showcase methods attackers use to disrupt service availability.                                  |
+| **XSS (Cross-Site Scripting)** | Explore how malicious scripts can be injected into web pages and compromise user interactions.   |
+
+### Defense
+
+| Defense Type              | Description                                                                                       |
+|---------------------------|---------------------------------------------------------------------------------------------------|
+| **reCAPTCHA**             | Enhances security by ensuring interactions are human-driven, preventing automated software attacks. |
+| **Two-factor Authentication** | Strengthens login security by requiring two forms of user verification, dramatically reducing the risk of unauthorized access. |
+| **DoS Defense**           | Implements advanced measures to protect against service disruptions caused by Denial of Service attacks. |
+| **JWT (JSON Web Tokens)** | Ensures secure user session management through robust token-based authentication.                  |
+| **XSS Protection**        | Provides safeguards against Cross-Site Scripting to maintain the integrity and security of user data. |
+| **Parameterized Queries**             | Protects against SQL injection attacks by separating SQL code from data inputs, ensuring that user inputs cannot alter the structure of SQL queries. |
+

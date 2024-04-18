@@ -14,6 +14,8 @@ from constants import (
     VENUE_DATABASE_FILENAME,
     DEFAULT_TOKEN_EXPIRATION_MINUTES,
     RESPONSE_STATUS,
+    ALLOWED_ORIGIN,
+    RECAPTCHA_SECRET_KEY,
 )
 from database import (
     get_sqlite_cursor,
@@ -40,7 +42,7 @@ IS_SAFE = True if os.environ.get("MODE", "safe").lower() == "safe" else False
 
 app = Flask(__name__)
 app.secret_key = APP_SECRET_KEY
-origins = ["http://127.0.0.1:5173", "http://localhost:5173"]
+origins = ALLOWED_ORIGIN
 CORS(app, supports_credentials=True, origins=origins)
 limiter = get_limiter(is_safe=IS_SAFE, app=app)
 
@@ -230,7 +232,7 @@ def login():
 
         # verify reCAPTCHA response
         if recaptcha_response:
-            secret = "6Lczk7kpAAAAALmq7-J9ZIiEPuSz1Ko5CC-oKG03"
+            secret = RECAPTCHA_SECRET_KEY
             payload = {"secret": secret, "response": recaptcha_response}
             recaptcha_verify_url = "https://www.google.com/recaptcha/api/siteverify"
             try:
