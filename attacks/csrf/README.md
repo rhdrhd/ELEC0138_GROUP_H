@@ -29,7 +29,7 @@
 
 1. Save JWT in local storage instead of cookie
 2. Set SameSite cookie attribute to 'Strict' or 'Lax'
-3. Use CSRF Token
-4. Check referer and origin headers
+
+Other good mitigation method have not been implemented yet.
 
 ...
