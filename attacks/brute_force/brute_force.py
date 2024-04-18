@@ -1,7 +1,8 @@
-import requests
-import time
 import itertools
 import string
+import time
+
+import requests
 
 
 def brute_force_attack(username, login_url, max_length=6, verbose=False):

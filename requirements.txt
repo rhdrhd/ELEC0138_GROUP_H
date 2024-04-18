@@ -4,3 +4,4 @@ flask_cors==4.0.0
 pyjwt==2.8.0
 Flask-Limiter==3.5.1
 requests==2.31.0
+isort==5.13.2

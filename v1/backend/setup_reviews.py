@@ -1,4 +1,5 @@
 import sqlite3
+
 from .database import insert_new_review
 
 # Path to where you want to create the SQLite DB file
