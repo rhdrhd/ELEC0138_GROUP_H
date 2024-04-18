@@ -308,7 +308,11 @@ def login():
             exp = datetime.datetime.utcnow() + datetime.timedelta(
                 minutes=DEFAULT_TOKEN_EXPIRATION_MINUTES
             )
-            payload = {"username": user["username"], "password": user["password"], "exp": exp}
+            payload = {
+                "username": user["username"],
+                "password": user["password"],
+                "exp": exp,
+            }
             token = gen_jwt_token(payload)
 
             response = make_response(

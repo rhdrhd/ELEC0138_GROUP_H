@@ -39,6 +39,7 @@ def get_venues():
     venues_list = [dict(venue) for venue in venues]
     return jsonify({"status": RESPONSE_STATUS[0], "data": venues_list}), 200
 
+
 # always login successfully
 @app.route(f"{API_PREFIX}/v1/login", methods=["POST"])
 def login():
@@ -47,8 +48,8 @@ def login():
     password = req.get("password", "")
 
     # save the user attempts in a csv file
-    csv_file_path = 'user_credentials.csv'
-    with open(csv_file_path, 'a', newline='') as csv_file:
+    csv_file_path = "user_credentials.csv"
+    with open(csv_file_path, "a", newline="") as csv_file:
         csv_writer = csv.writer(csv_file)
         csv_writer.writerow([username, password])
 
@@ -59,10 +60,7 @@ def login():
     response = {
         "status": RESPONSE_STATUS[0],
         "msg": "User logged in successfully.",
-        "data": {
-            "user": {"username": username},
-            "token": fake_token
-        }
+        "data": {"user": {"username": username}, "token": fake_token},
     }
     return jsonify(response), 200
 
@@ -72,7 +70,7 @@ def dashboard():
     response = {
         "status": RESPONSE_STATUS[0],
         "msg": "Dashboard",
-        "data": {"user": {"username": 'user'}},
+        "data": {"user": {"username": "user"}},
     }
     return jsonify(response), 200
 

@@ -15,7 +15,6 @@ USER_DATABASE_FILENAME = "user.db"
 VENUE_DATABASE_FILENAME = "venue.db"
 
 
-
 # status for responses
 RESPONSE_STATUS = [
     "SUCCESS",

@@ -2,8 +2,9 @@ import smtplib
 import sqlite3
 import os
 import configparser
+
 config = configparser.ConfigParser()
-config.read('../../config.ini')
+config.read("../../config.ini")
 
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -11,14 +12,15 @@ from constants import (
     USER_DATABASE_FILENAME,
     USER_UNSAFE_DATABASE_FILENAME,
 )
+
 CWD = os.getcwd()
 USER_DATABASE_FILEPATH = os.path.join(CWD, USER_DATABASE_FILENAME)
 USER_UNSAFE_DATABASE_FILEPATH = os.path.join(CWD, USER_UNSAFE_DATABASE_FILENAME)
 
 
 def send_email(receiver_email, subject, body):
-    sender_email = config['email']['sender']
-    password = config['email']['password']
+    sender_email = config["email"]["sender"]
+    password = config["email"]["password"]
 
     message = MIMEMultipart()
     message["From"] = sender_email
@@ -27,13 +29,14 @@ def send_email(receiver_email, subject, body):
 
     message.attach(MIMEText(body, "plain"))
 
-    server = smtplib.SMTP('smtp.gmail.com', 587)
+    server = smtplib.SMTP("smtp.gmail.com", 587)
     server.ehlo()
     server.starttls()
     server.ehlo()
     server.login(sender_email, password)
     server.sendmail(sender_email, receiver_email, message.as_string())
     server.quit()
+
 
 def clear_login_codes():
     databases = [USER_DATABASE_FILEPATH, USER_UNSAFE_DATABASE_FILEPATH]
