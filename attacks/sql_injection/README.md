@@ -8,7 +8,7 @@ cur.execute(f"SELECT * FROM users WHERE username = '{username}' AND password = '
 ### SQL injection examples:  
 Input belows info in website to login:  
 * username: `' OR '1'='1' --`  
-* there's no need to input teh password   
+* there's no need to input the password   
   
 Or open a new terminal and run:
 ```
