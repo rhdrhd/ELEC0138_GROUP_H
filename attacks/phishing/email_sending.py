@@ -1,22 +1,24 @@
 import csv
 import smtplib
 import configparser
+
 config = configparser.ConfigParser()
-config.read('../../config.ini')
+config.read("../../config.ini")
 
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
-victims_file = 'victim_list.csv'
-phishing_link = 'http://localhost:4001/'
+victims_file = "victim_list.csv"
+phishing_link = "http://localhost:4001/"
 
-sender_email = config['phishing_email']['sender']
-app_password = config['phishing_email']['password']
+sender_email = config["phishing_email"]["sender"]
+app_password = config["phishing_email"]["password"]
 
 msg = MIMEMultipart()
 msg["From"] = "Ticketing Service Support <support@ticketservice.com>"
 msg["Subject"] = "Action Required: Verify Your Account Now"
-text = MIMEText(f"""\
+text = MIMEText(
+    f"""\
 Dear valued customer,
 
 We have detected suspicious activity on your account. For your security, you must verify your account immediately.
@@ -28,15 +30,16 @@ Failure to verify your account within 24 hours will result in account suspension
 
 Best regards,
 Ticketing Service Support Team
-""")
+"""
+)
 msg.attach(text)
 
 try:
-    server = smtplib.SMTP('smtp.gmail.com', 587)
+    server = smtplib.SMTP("smtp.gmail.com", 587)
     server.starttls()
     server.login(sender_email, app_password)
 
-    with open(victims_file, mode='r', newline='', encoding='utf-8') as file:
+    with open(victims_file, mode="r", newline="", encoding="utf-8") as file:
         reader = csv.reader(file)
         for row in reader:
             victim_email = row[0]

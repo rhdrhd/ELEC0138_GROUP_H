@@ -26,4 +26,3 @@ RESPONSE_STATUS = [
     "SUCCESS",
     "FAILED",
 ]
-
