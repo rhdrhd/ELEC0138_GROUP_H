@@ -1,6 +1,6 @@
-# ELEC0138_GROUP_H: Security System for Online Ticket Sales Website
+# Group H: Security System for Online Ticket Sales Website
 
-This is Group H's final assignment for the module ELEC0138: Security and Privacy 23/24.
+This is **Group H**'s final assignment for the module **ELEC0138: Security and Privacy 23/24**.
 
 In this project, a ticket sales website is created.
 The website is designed to sell tickets for various events.
